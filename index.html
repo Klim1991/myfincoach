@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ИИ ФинКоуч</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -15,216 +16,187 @@
         .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
         .screen.active { display: block; }
         
-        /* Онбординг */
-        .onboarding-slide { text-align: center; padding: 60px 20px; }
-        .onboarding-slide h1 { font-size: 28px; font-weight: 800; margin-bottom: 20px; color: #1a1a1a; }
-        .onboarding-slide p { font-size: 16px; color: #666; line-height: 1.5; margin-bottom: 40px; }
-        
-        /* Формы */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
-        .form-group select, .form-group input { width: 100%; padding: 16px; border: 2px solid #e5e7eb; 
-            border-radius: 12px; font-size: 16px; background: white; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #10b981; }
-        .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .checkbox-group input[type="checkbox"] { width: auto; transform: scale(1.2); }
-        
         .btn { background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; 
                padding: 16px 32px; border-radius: 16px; font-size: 16px; font-weight: 600; 
                width: 100%; max-width: 280px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
         .btn:active { transform: scale(0.98); }
         .btn-secondary { background: #6b7280; }
         .btn-premium { background: linear-gradient(45deg, #f59e0b, #d97706); }
+        .btn-danger { background: #ef4444; }
         
-        /* Dashboard */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+        .form-group select, .form-group input { width: 100%; padding: 16px; border: 2px solid #e5e7eb; 
+            border-radius: 12px; font-size: 16px; background: white; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #10b981; }
+        
         .dashboard-header { text-align: center; padding: 30px 0; }
         .goal-title { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
-        .progress-circle { width: 120px; height: 120px; border-radius: 50%; 
-                          background: conic-gradient(#10b981 0deg 270deg, #e5e7eb 270deg 360deg); 
-                          margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; 
-                          font-size: 28px; font-weight: 800; color: #10b981; }
+        .progress-circle { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; 
+                          display: flex; align-items: center; justify-content: center; font-size: 28px; 
+                          font-weight: 800; color: #10b981; background: conic-gradient(#10b981 0deg 270deg, #e5e7eb 270deg 360deg); }
         .progress-text { font-size: 14px; color: #666; }
         
-        .today-actions { margin-top: 30px; }
-        .action-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; 
+        .action-card, .goal-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; 
                       box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .action-title { font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
         .action-desc { color: #666; font-size: 14px; margin-bottom: 16px; }
         
-        /* Цели */
-        .goal-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; 
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
-        .goal-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-        .goal-progress { font-size: 14px; font-weight: 700; color: #10b981; }
+        .limit-warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 16px; margin: 20px 0; text-align: center; }
+        .premium-badge { background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         
-        /* Tab bar */
+        /* Админ панель */
+        .admin-panel { background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
+        .metric { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
+        .metric-value { font-weight: 800; font-size: 24px; }
+        
+        /* Chart */
+        #expenseChart { max-height: 250px; }
+        
         .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; 
                    padding: 12px 20px; display: flex; gap: 10px; box-shadow: 0 -2px 20px rgba(0,0,0,0.1); }
-        .tab-btn { flex: 1; border: none; background: none; padding: 12px 4px; font-size: 12px; 
-                   color: #9ca3af; cursor: pointer; }
+        .tab-btn { flex: 1; border: none; background: none; padding: 12px 4px; font-size: 12px; color: #9ca3af; }
         .tab-btn.active { color: #10b981; font-weight: 600; }
         .tab-btn .icon { display: block; font-size: 20px; margin-bottom: 2px; }
         
-        /* Анимации */
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .screen.active { animation: slideIn 0.4s ease-out; }
-        
-        .premium-badge { background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; 
-                        font-size: 12px; font-weight: 600; }
     </style>
 </head>
 <body>
-    <!-- ЭКРАН 0-1: Онбординг + Профиль -->
+    <!-- Profile Setup -->
     <div id="profileSetup" class="screen active">
         <div style="text-align: center; padding: 60px 20px;">
-            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 20px;">Настроим план</h1>
-            <p style="font-size: 16px; color: #666; margin-bottom: 30px;">Пара вопросов для персональных рекомендаций</p>
+            <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
+            <p style="font-size: 16px; color: #666;">Пара вопросов для персонализации</p>
         </div>
-        
         <div class="form-group">
-            <label>Примерный доход</label>
+            <label>Доход</label>
             <select id="incomeRange">
                 <option value="low">до 40 000 ₽</option>
-                <option value="medium" selected>40 000–70 000 ₽</option>
-                <option value="high">70 000–120 000 ₽</option>
-                <option value="veryhigh">120 000 ₽ и выше</option>
+                <option value="medium" selected>40–70 000 ₽</option>
+                <option value="high">70–120 000 ₽</option>
+                <option value="veryhigh">120 000 ₽+</option>
             </select>
         </div>
-        
         <div class="checkbox-group">
-            <input type="checkbox" id="hasDebt" onchange="toggleDebt()">
-            <label for="hasDebt" style="font-weight: normal;">Есть кредиты/кредитные карты</label>
+            <input type="checkbox" id="hasDebt"> <label for="hasDebt">Есть кредиты</label>
         </div>
-        
         <div class="checkbox-group">
-            <input type="checkbox" id="hasMortgage" onchange="toggleMortgage()">
-            <label for="hasMortgage" style="font-weight: normal;">Есть ипотека</label>
+            <input type="checkbox" id="hasMortgage"> <label for="hasMortgage">Есть ипотека</label>
         </div>
-        
         <button class="btn" onclick="saveProfileAndShowGoals()">Продолжить к целям</button>
     </div>
     
-    <!-- ЭКРАН 2: Выбор цели -->
+    <!-- Goal Select -->
     <div id="goalSelect" class="screen">
-        <div style="text-align: center; padding: 40px 20px 30px;">
-            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 20px;">С чего начнём?</h1>
+        <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 40px 20px 20px;">С чего начнём?</h1>
+        <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
+            <h3>🛡️ Финансовая подушка</h3><div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
         </div>
-        
-        <div class="goal-card" onclick="selectGoalType('pillow')" style="cursor: pointer;">
-            <div>
-                <h3>🛡️ Финансовая подушка</h3>
-                <div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
-            </div>
+        <div class="goal-card" onclick="selectGoal('debt')" style="cursor: pointer;">
+            <h3>💳 Закрыть долги</h3><div style="font-size: 14px; color: #666;">Кредитки, займы</div>
         </div>
-        
-        <div class="goal-card" onclick="selectGoalType('debt')" style="cursor: pointer;">
-            <div>
-                <h3>💳 Закрыть долги</h3>
-                <div style="font-size: 14px; color: #666;">Кредитки, займы</div>
-            </div>
+        <div class="goal-card" onclick="selectGoal('purchase')" style="cursor: pointer;">
+            <h3>🏠 Крупная покупка</h3><div style="font-size: 14px; color: #666;">Машина, отпуск</div>
         </div>
-        
-        <div class="goal-card" onclick="selectGoalType('purchase')" style="cursor: pointer;">
-            <div>
-                <h3>🏠 Крупная покупка</h3>
-                <div style="font-size: 14px; color: #666;">Машина, ремонт, отпуск</div>
-            </div>
-        </div>
-        
-        <button class="btn" onclick="showDashboard()" style="margin-top: 20px;">Покажу демо</button>
+        <button class="btn" onclick="showDashboard()">Показать демо</button>
     </div>
     
-    <!-- ЭКРАН 4: Главный Dashboard -->
+    <!-- Dashboard -->
     <div id="dashboard" class="screen">
         <div class="dashboard-header">
-            <div class="goal-title">🛡️ Финансовая подушка</div>
+            <div class="goal-title" id="goalTitle">🛡️ Финансовая подушка</div>
             <div class="progress-circle" id="progressCircle">30%</div>
-            <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽<br>Достигнешь: 15 июня</div>
+            <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽</div>
         </div>
         
-        <div class="today-actions">
-            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 20px;">Шаги на сегодня</h3>
-            <div id="dailyActions"></div>
+        <div id="freemiumLimit" class="limit-warning" style="display: none;">
+            🚫 Бесплатно: 1 цель. <span class="premium-badge">Premium → 5 целей</span>
         </div>
+        
+        <h3 style="font-size: 20px; font-weight: 700; margin: 30px 0 20px;">Сегодняшние шаги</h3>
+        <div id="dailyActions"></div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">В этом месяце отложено: <span id="monthlySaved">2 300 ₽</span></div>
-            <button class="btn btn-premium" onclick="showPremium()">🚀 Premium 139 ₽/мес</button>
+            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Месяц: <span id="monthlySaved">2 300 ₽</span></div>
+            <button class="btn btn-premium" onclick="openStars()">🚀 Premium 139 ₽/мес</button>
         </div>
     </div>
     
-    <!-- ЭКРАН Цели -->
+    <!-- Goals -->
     <div id="goals" class="screen">
-        <div style="padding: 20px 0;">
-            <h2 style="font-size: 24px; font-weight: 700; padding: 0 20px; margin-bottom: 20px;">Твои цели</h2>
-            <div id="goalsList">
-                <div class="goal-card">
-                    <div>
-                        <h3>🛡️ Финансовая подушка</h3>
-                        <div class="goal-progress">30 000 ₽ из 100 000 ₽ (30%)</div>
-                    </div>
-                    <div style="font-size: 24px;">→</div>
-                </div>
-            </div>
-            <button class="btn" onclick="showScreen('goalSelect')" style="margin: 20px;">+ Добавить цель</button>
+        <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
+        <div id="goalsList"></div>
+        <button class="btn" onclick="showScreen('goalSelect')">+ Новая цель</button>
+    </div>
+    
+    <!-- Analytics -->
+    <div id="analytics" class="screen">
+        <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Расходы</h2>
+        <canvas id="expenseChart"></canvas>
+        <div style="padding: 20px; background: white; border-radius: 16px; margin: 20px;">
+            <div style="font-size: 18px; font-weight: 600;">🍕 Доставка еды: 4 500 ₽</div>
+            <div style="color: #666; font-size: 14px;">Сократи на 20% → +900 ₽ в копилку/мес</div>
         </div>
     </div>
     
-    <!-- ЭКРАН Профиль -->
+    <!-- Profile -->
     <div id="profile" class="screen">
         <div style="text-align: center; padding: 60px 20px 40px;">
-            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 20px;">Профиль</h1>
-            <p style="font-size: 18px; color: #1a1a1a; margin-bottom: 30px;">Клим</p>
+            <h1 style="font-size: 28px; font-weight: 800;">Профиль</h1>
             <div class="premium-badge" id="subscriptionStatus" style="display: none;">Premium до 15.02</div>
         </div>
-        
         <div style="padding: 0 20px;">
-            <button class="btn" onclick="showPremium()">Управление подпиской</button>
-            <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить профиль</button>
-            <div style="text-align: center; margin-top: 30px;">
-                <p style="font-size: 14px; color: #666;">Доход: <span id="profileIncome">40–70к ₽</span></p>
-                <p style="font-size: 14px; color: #666;" id="profileFlags"></p>
+            <button class="btn btn-premium" onclick="openStars()">Управление подпиской</button>
+            <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить</button>
+            <div style="margin-top: 30px;">
+                <p>Доход: <span id="profileIncome">40–70к ₽</span></p>
+                <p id="profileFlags"></p>
             </div>
+        </div>
+        
+        <!-- АДМИН ПАНЕЛЬ (только для тебя) -->
+        <div id="adminPanel" class="admin-panel" style="display: none;">
+            <div class="metric"><span>Активных юзеров</span><span class="metric-value" id="adminUsers">127</span></div>
+            <div class="metric"><span>Premium</span><span class="metric-value" id="adminPremium">12</span></div>
+            <div class="metric"><span>MRR</span><span class="metric-value" id="adminMRR">1 668 ₽</span></div>
+            <button class="btn" onclick="sendPushAll()" style="background: white; color: #3b82f6; margin-top: 10px;">📢 Push всем</button>
         </div>
     </div>
     
     <!-- Tab bar -->
     <div class="tab-bar">
-        <button class="tab-btn active" onclick="showScreen('dashboard')">
-            <span class="icon">📊</span>Главная
-        </button>
-        <button class="tab-btn" onclick="showScreen('goals')">
-            <span class="icon">🎯</span>Цели
-        </button>
-        <button class="tab-btn" onclick="showScreen('analytics')">
-            <span class="icon">📈</span>Аналитика
-        </button>
-        <button class="tab-btn" onclick="showScreen('profile')">
-            <span class="icon">👤</span>Профиль
-        </button>
+        <button class="tab-btn active" onclick="showScreen('dashboard')"><span class="icon">📊</span>Главная</button>
+        <button class="tab-btn" onclick="showScreen('goals')"><span class="icon">🎯</span>Цели</button>
+        <button class="tab-btn" onclick="showScreen('analytics')"><span class="icon">📈</span>Аналитика</button>
+        <button class="tab-btn" onclick="showScreen('profile')"><span class="icon">👤</span>Профиль</button>
     </div>
 
     <script>
-        // Telegram init
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
+        Telegram.WebApp.ready(); Telegram.WebApp.expand();
         
-        // Данные пользователя
+        // ТВОЙ ADMIN ID
+        const ADMIN_ID = 6902824637;
         let userData = JSON.parse(localStorage.getItem('fincoach_user')) || {
             profile: { income: 'medium', hasDebt: false, hasMortgage: false },
-            goals: [{ id: 1, type: 'pillow', title: 'Финансовая подушка', target: 100000, current: 30000, date: '2026-06-15' }],
-            actions: [],
-            subscription: { active: false, expires: null }
+            goals: [{ id: 1, type: 'pillow', title: 'Финансовая подушка', target: 100000, current: 30000 }],
+            actions: [], subscription: { active: false }, userId: Telegram.WebApp.initDataUnsafe.user?.id
         };
         
-        // Инициализация
+        if (!userData.userId) userData.userId = Date.now().toString();
+        localStorage.setItem('fincoach_user', JSON.stringify(userData));
+        
+        let expenseChart;
+        
         function initApp() {
-            updateProfileDisplay();
-            generateDailyActions();
-            updateProgressDisplay();
+            if (Telegram.WebApp.initDataUnsafe.user?.id == ADMIN_ID) {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+            updateAll();
+            initChart();
         }
         
-        // Сохранение профиля
         function saveProfileAndShowGoals() {
             userData.profile.income = document.getElementById('incomeRange').value;
             userData.profile.hasDebt = document.getElementById('hasDebt').checked;
@@ -233,83 +205,128 @@
             showScreen('goalSelect');
         }
         
-        // Выбор типа цели
-        function selectGoalType(type) {
-            userData.currentGoalType = type;
-            showScreen('goalSetup'); // Пока пропускаем настройку
-            setTimeout(() => showDashboard(), 1000);
+        function selectGoal(type) {
+            if (userData.goals.length >= (userData.subscription.active ? 5 : 1)) {
+                document.getElementById('freemiumLimit').style.display = 'block';
+                setTimeout(() => document.getElementById('freemiumLimit').style.display = 'none', 3000);
+                return;
+            }
+            userData.goals.push({
+                id: Date.now(), type, title: type === 'pillow' ? 'Финансовая подушка' : 
+                type === 'debt' ? 'Закрыть долги' : 'Крупная покупка',
+                target: 100000, current: 0
+            });
+            localStorage.setItem('fincoach_user', JSON.stringify(userData));
+            showDashboard();
         }
         
-        // Генерация ежедневных действий
         function generateDailyActions() {
             const actions = [
-                { title: '💰 Отложи сегодня 200 ₽', desc: 'Это приблизит цель на 3 дня', income: 'all' },
-                { title: '📊 Проверь доставку еды', desc: '4 500 ₽/мес → лимит 3 000 ₽', income: 'all' },
-                { title: '💳 Проверь переплату по карте', desc: '+1 200 ₽/мес в копилку', debt: true },
-                { title: '🏠 Сравни тарифы ЖКХ', desc: 'Экономия 500–1000 ₽/мес', mortgage: true }
+                { title: '💰 Отложи 200 ₽', desc: 'Цель ближе на 3 дня', income: 'all' },
+                { title: '📊 Лимит доставки', desc: '4 500 → 3 000 ₽/мес', income: 'all' },
+                { title: '💳 Переплата карты', desc: '+1 200 ₽/мес', debt: true },
+                { title: '🏠 Тарифы ЖКХ', desc: 'Экономия 500–1000 ₽', mortgage: true }
             ];
             
             const profile = userData.profile;
-            const todayActions = actions.filter(action => {
-                if (action.income === 'all') return true;
-                if (action.debt && profile.hasDebt) return true;
-                if (action.mortgage && profile.hasMortgage) return true;
-                return false;
-            }).slice(0, 3);
+            const todayActions = actions.filter(a => 
+                a.income === 'all' || (a.debt && profile.hasDebt) || (a.mortgage && profile.hasMortgage)
+            ).slice(0, 3);
             
-            let html = '';
-            todayActions.forEach(action => {
-                html += `
-                    <div class="action-card">
-                        <div class="action-title">${action.title}</div>
-                        <div class="action-desc">${action.desc}</div>
-                        <button class="btn" style="font-size: 14px; padding: 12px;" onclick="completeAction(this)">Сделано ✓</button>
-                    </div>
-                `;
-            });
-            document.getElementById('dailyActions').innerHTML = html || '<div style="text-align:center;color:#666">Завтра новые шаги</div>';
+            document.getElementById('dailyActions').innerHTML = todayActions.map(action => `
+                <div class="action-card">
+                    <div class="action-title">${action.title}</div>
+                    <div class="action-desc">${action.desc}</div>
+                    <button class="btn" style="font-size: 14px; padding: 12px;" 
+                            onclick="completeAction(this)">Сделано ✓</button>
+                </div>
+            `).join('') || '<div style="text-align:center;color:#666;padding:40px">Завтра новые шаги</div>';
         }
         
         function completeAction(btn) {
-            btn.textContent = '✓ Выполнено!';
-            btn.style.background = '#059669';
+            btn.textContent = '✓ Выполнено!'; btn.style.background = '#059669';
             Telegram.WebApp.HapticFeedback.impactOccurred('light');
             userData.actions.push({ date: new Date().toISOString(), completed: true });
             localStorage.setItem('fincoach_user', JSON.stringify(userData));
         }
         
+        function updateAll() {
+            updateProgressDisplay();
+            generateDailyActions();
+            updateGoalsList();
+            updateProfileDisplay();
+        }
+        
         function updateProgressDisplay() {
             const goal = userData.goals[0];
+            if (!goal) return;
             const percent = Math.round((goal.current / goal.target) * 100);
+            document.getElementById('goalTitle').textContent = goal.title;
             document.getElementById('progressCircle').textContent = percent + '%';
             document.getElementById('progressCircle').style.background = 
                 `conic-gradient(#10b981 0deg ${percent*3.6}deg, #e5e7eb ${percent*3.6}deg 360deg)`;
-            document.getElementById('progressText').innerHTML = 
-                `${goal.current.toLocaleString()} ₽ из ${goal.target.toLocaleString()} ₽<br>Достигнешь: ${goal.date}`;
+            document.getElementById('progressText').textContent = 
+                `${goal.current.toLocaleString()} ₽ из ${goal.target.toLocaleString()} ₽`;
+        }
+        
+        function updateGoalsList() {
+            document.getElementById('goalsList').innerHTML = userData.goals.map(goal => `
+                <div class="goal-card">
+                    <div>
+                        <h3>${goal.title}</h3>
+                        <div style="font-size: 14px; font-weight: 700; color: #10b981;">
+                            ${goal.current.toLocaleString()} ₽ из ${goal.target.toLocaleString()} ₽ 
+                            (${Math.round(goal.current/goal.target*100)}%)
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
         
         function updateProfileDisplay() {
             const profile = userData.profile;
             const incomeMap = { low: 'до 40к', medium: '40–70к', high: '70–120к', veryhigh: '120к+' };
             document.getElementById('profileIncome').textContent = incomeMap[profile.income] + ' ₽';
-            
             let flags = [];
-            if (profile.hasDebt) flags.push('💳 Есть кредиты');
-            if (profile.hasMortgage) flags.push('🏠 Есть ипотека');
+            if (profile.hasDebt) flags.push('💳 Кредиты');
+            if (profile.hasMortgage) flags.push('🏠 Ипотека');
             document.getElementById('profileFlags').textContent = flags.join(', ') || 'Флагов нет';
         }
         
-        function showPremium() {
-            Telegram.WebApp.showAlert('Premium 139 ₽/мес\n\n• До 5 целей\n• Полная аналитика\n• Персональные советы\n\nСкоро в Telegram Stars!');
+        function initChart() {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            expenseChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['🍕 Еда', '🚗 Транспорт', '🏠 ЖКХ', '💳 Кредиты', '🎯 Прочее'],
+                    datasets: [{
+                        data: [4500, 3200, 2800, 1500, 4200],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6b7280']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
         }
         
-        // Навигация
+        function openStars() {
+            if (userData.subscription.active) {
+                Telegram.WebApp.showAlert('✅ Premium активна!');
+            } else {
+                Telegram.WebApp.showAlert('Premium 139 ₽/мес\n\n• 5 целей\n• Полная аналитика\n• Персональные советы\n\nСкоро Telegram Stars!');
+                // userData.subscription.active = true; // для теста
+                // localStorage.setItem('fincoach_user', JSON.stringify(userData));
+            }
+        }
+        
+        function sendPushAll() {
+            Telegram.WebApp.showAlert('📢 Push отправлен всем 127 юзерам!');
+        }
+        
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId)?.classList.add('active');
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.tab-btn')?.classList.add('active') || 
-            document.querySelector(`[onclick="showScreen('${screenId}')"]`).classList.add('active');
+            event.target.closest('.tab-btn')?.classList.add('active');
         }
         
         // Старт
