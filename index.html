@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ИИ ФинКоуч</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh; padding-bottom: 80px;
+        }
+        .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
+        .screen.active { display: block; }
+        
+        /* Онбординг */
+        .onboarding-slide { text-align: center; padding: 60px 20px; }
+        .onboarding-slide h1 { font-size: 28px; font-weight: 800; margin-bottom: 20px; color: #1a1a1a; }
+        .onboarding-slide p { font-size: 16px; color: #666; line-height: 1.5; margin-bottom: 40px; }
+        .btn { background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; 
+               padding: 16px 32px; border-radius: 16px; font-size: 16px; font-weight: 600; 
+               width: 100%; max-width: 280px; cursor: pointer; transition: all 0.3s; }
+        .btn:active { transform: scale(0.98); }
+        
+        /* Главный экран */
+        .dashboard-header { text-align: center; padding: 30px 0; }
+        .goal-title { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+        .progress-circle { width: 120px; height: 120px; border-radius: 50%; 
+                          background: conic-gradient(#10b981 0deg 270deg, #e5e7eb 270deg 360deg); 
+                          margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; 
+                          font-size: 28px; font-weight: 800; color: #10b981; }
+        .progress-text { font-size: 14px; color: #666; }
+        .today-actions { margin-top: 30px; }
+        .action-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; 
+                      box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .action-title { font-size: 18px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+        .action-desc { color: #666; font-size: 14px; margin-bottom: 16px; }
+        
+        /* Tab bar */
+        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; 
+                   padding: 12px 20px; display: flex; gap: 10px; box-shadow: 0 -2px 20px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; border: none; background: none; padding: 12px 4px; font-size: 12px; 
+                   color: #9ca3af; cursor: pointer; }
+        .tab-btn.active { color: #10b981; font-weight: 600; }
+        .tab-btn .icon { display: block; font-size: 20px; margin-bottom: 2px; }
+        
+        /* Анимации */
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .screen.active { animation: slideIn 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <!-- ЭКРАН 0: Онбординг -->
+    <div id="onboarding1" class="screen active">
+        <div class="onboarding-slide">
+            <h1>🧠 Наведи порядок в деньгах</h1>
+            <p>Ставим цель и помогаем тебе к ней идти каждый день простыми шагами</p>
+            <button class="btn" onclick="nextSlide()">Дальше</button>
+        </div>
+    </div>
+    
+    <div id="onboarding2" class="screen">
+        <div class="onboarding-slide">
+            <h1>📈 Маленькие шаги</h1>
+            <p>Каждый день получаешь 1–3 простых финансовых действия. Отмечаешь — видишь прогресс</p>
+            <button class="btn" onclick="nextSlide()">Дальше</button>
+        </div>
+    </div>
+    
+    <div id="onboarding3" class="screen">
+        <div class="onboarding-slide">
+            <h1>🎯 Видимый результат</h1>
+            <p>Смотри, как растёт подушка безопасности, уменьшаются долги, приближается цель</p>
+            <button class="btn" onclick="showDashboard()">Начать!</button>
+        </div>
+    </div>
+    
+    <!-- ЭКРАН 4: Главный Dashboard -->
+    <div id="dashboard" class="screen">
+        <div class="dashboard-header">
+            <div class="goal-title">Финансовая подушка</div>
+            <div class="progress-circle">30%</div>
+            <div class="progress-text">30 000 ₽ из 100 000 ₽<br>Достигнешь: 15 июня</div>
+        </div>
+        
+        <div class="today-actions">
+            <div class="action-card">
+                <div class="action-title">💰 Отложи сегодня 200 ₽</div>
+                <div class="action-desc">Это приблизит цель на 3 дня</div>
+                <button class="btn" style="font-size: 14px; padding: 12px;">Сделано ✓</button>
+            </div>
+            <div class="action-card">
+                <div class="action-title">📊 Проверь доставку еды</div>
+                <div class="action-desc">4 500 ₽/мес → лимит 3 000 ₽ сэкономит 1 500 ₽</div>
+                <button class="btn" style="font-size: 14px; padding: 12px;">Сделано ✓</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tab bar -->
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="showScreen('dashboard')">
+            <span class="icon">📊</span>Главная
+        </button>
+        <button class="tab-btn" onclick="showScreen('goals')">
+            <span class="icon">🎯</span>Цели
+        </button>
+        <button class="tab-btn" onclick="showScreen('analytics')">
+            <span class="icon">📈</span>Аналитика
+        </button>
+        <button class="tab-btn" onclick="showScreen('profile')">
+            <span class="icon">👤</span>Профиль
+        </button>
+    </div>
+
+    <script>
+        // Telegram WebApp init
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        
+        let currentSlide = 1;
+        
+        function nextSlide() {
+            document.getElementById(`onboarding${currentSlide}`).classList.remove('active');
+            currentSlide++;
+            document.getElementById(`onboarding${currentSlide}`).classList.add('active');
+        }
+        
+        function showDashboard() {
+            document.getElementById('onboarding3').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        }
+        
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId)?.classList.add('active');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
