@@ -16,7 +16,18 @@
         }
         .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
         .screen.active { display: block; }
-        
+
+        /* Базовая анимация появления блока */
+        .fade-slide-up {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 260ms ease-out, transform 260ms ease-out;
+        }
+        .fade-slide-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Приветствие UTP */
         .welcome-hero { 
             text-align: center; 
@@ -94,6 +105,7 @@
             font-size: 28px; 
             font-weight: 800; 
             color: #22c55e;
+            transition: transform 160ms ease-out;
         }
         .welcome-result-desc {
             font-size: 13px; 
@@ -128,12 +140,34 @@
                    box-shadow: 0 8px 20px rgba(15,23,42,0.15); }
         .back-btn::before { content: '←'; font-size: 20px; font-weight: bold; }
         
-        .btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; 
-               padding: 18px 36px; border-radius: 18px; font-size: 16px; font-weight: 700; 
-               width: 100%; max-width: 340px; cursor: pointer; transition: all 0.2s; margin: 10px 0;
-               box-shadow: 0 14px 30px rgba(16,185,129,0.35);
+        .btn { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            color: white; 
+            border: none; 
+            padding: 18px 36px; 
+            border-radius: 18px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            width: 100%; 
+            max-width: 340px; 
+            cursor: pointer; 
+            transition: transform 120ms ease-out, box-shadow 120ms ease-out, opacity 260ms ease-out, background 160ms ease-out;
+            margin: 10px 0;
+            box-shadow: 0 14px 30px rgba(16,185,129,0.35);
         }
-        .btn:active { transform: scale(0.97) translateY(1px); box-shadow: 0 8px 18px rgba(16,185,129,0.35); }
+        .btn:active { 
+            transform: scale(0.96) translateY(1px); 
+            box-shadow: 0 8px 18px rgba(16,185,129,0.35); 
+        }
+        .btn-primary-tap {
+            animation: btnPulse 200ms ease-out;
+        }
+        @keyframes btnPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.97); }
+            100% { transform: scale(1); }
+        }
+
         .btn-secondary { background: #6b7280; box-shadow: none; }
         .btn-premium { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 12px 26px rgba(245,158,11,0.35); }
         .btn-outline { 
@@ -181,21 +215,33 @@
         
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .screen.active { animation: slideIn 0.4s ease-out; }
+
+        /* «Кач» для суммы/бейджа при старте */
+        @keyframes gentleSwing {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-3px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(2px); }
+            100% { transform: translateY(0); }
+        }
+        .swing-once {
+            animation: gentleSwing 220ms ease-out;
+        }
     </style>
 </head>
 <body>
     <!-- ЭКРАН 0: Приветствие UTP -->
     <div id="welcome" class="screen active">
         <div class="welcome-hero">
-            <div class="welcome-badge">
+            <div class="welcome-badge fade-slide-up" id="welcomeBadge">
                 <span class="icon">🛡️</span>
                 <span>Создано с участием финансовых специалистов</span>
             </div>
-            <h1>Наведи порядок в деньгах без стресса</h1>
-            <p class="welcome-subtitle">
+            <h1 class="fade-slide-up" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
+            <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
                 ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
             </p>
-            <div class="welcome-tagline">
+            <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
                 <span>Накопи подушку</span><span class="dot">•</span>
                 <span>Закрой долги</span><span class="dot">•</span>
                 <span>Купи машину</span><span class="dot">•</span>
@@ -204,10 +250,10 @@
         </div>
         
         <!-- РЕЗУЛЬТАТ + боль/решение -->
-        <div class="welcome-result">
+        <div class="welcome-result fade-slide-up" id="welcomeResult">
             <div class="welcome-result-main">
                 <div>
-                    <div class="welcome-result-amount">100 000 ₽</div>
+                    <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
                 </div>
             </div>
             <div class="welcome-result-desc">
@@ -217,13 +263,13 @@
 
         <!-- Вынесенный бейдж под блоком -->
         <div style="display:flex; justify-content:center; margin-bottom: 4px;">
-            <div class="welcome-result-badge">
+            <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
                 Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
             </div>
         </div>
         
         <div style="display:flex; flex-direction:column; align-items:center; margin-top:14px;">
-            <button class="btn" onclick="showScreen('profileSetup')" style="margin-bottom: 10px;">
+            <button class="btn fade-slide-up" id="startBtn" onclick="onStartClick()" style="margin-bottom: 10px;">
                 🚀 Начать путь к своей цели
             </button>
             <p style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
@@ -389,12 +435,77 @@
         
         localStorage.setItem('fincoach_user', JSON.stringify(userData));
         let expenseChart;
-        
+
+        function animateWelcomeEntrance() {
+            const elements = [
+                document.getElementById('welcomeBadge'),
+                document.getElementById('welcomeTitle'),
+                document.getElementById('welcomeSubtitle'),
+                document.getElementById('welcomeTagline'),
+                document.getElementById('welcomeResult'),
+                document.getElementById('welcomeBottomBadge'),
+                document.getElementById('startBtn')
+            ];
+            elements.forEach((el, index) => {
+                if (!el) return;
+                setTimeout(() => {
+                    el.classList.add('visible');
+                }, 80 * index);
+            });
+
+            // Живой счётчик суммы
+            const amountEl = document.getElementById('welcomeAmount');
+            if (amountEl) {
+                const target = 100000;
+                const duration = 600;
+                const startTime = performance.now();
+                const formatter = new Intl.NumberFormat('ru-RU');
+
+                function tick(now) {
+                    const progress = Math.min((now - startTime) / duration, 1);
+                    const current = Math.round(target * progress);
+                    amountEl.textContent = formatter.format(current) + ' ₽';
+                    if (progress < 1) {
+                        requestAnimationFrame(tick);
+                    } else {
+                        amountEl.classList.add('swing-once');
+                        setTimeout(() => amountEl.classList.remove('swing-once'), 260);
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+        }
+
+        function onStartClick() {
+            const btn = document.getElementById('startBtn');
+            const amountEl = document.getElementById('welcomeAmount');
+            const badgeEl = document.getElementById('welcomeBadge');
+
+            if (btn) {
+                btn.classList.remove('btn-primary-tap');
+                void btn.offsetWidth;
+                btn.classList.add('btn-primary-tap');
+            }
+            if (amountEl) {
+                amountEl.classList.add('swing-once');
+                setTimeout(() => amountEl.classList.remove('swing-once'), 260);
+            }
+            if (badgeEl) {
+                badgeEl.classList.add('swing-once');
+                setTimeout(() => badgeEl.classList.remove('swing-once'), 260);
+            }
+
+            showScreen('profileSetup');
+        }
+
         function initApp() {
             if (parseInt(Telegram.WebApp.initDataUnsafe?.user?.id) === ADMIN_ID || userData.userId == ADMIN_ID) {
                 document.getElementById('adminPanel').style.display = 'block';
             }
             if (document.getElementById('analytics')) initChart();
+
+            // Инициализация анимаций приветствия после лёгкой задержки
+            setTimeout(animateWelcomeEntrance, 80);
         }
         
         function saveProfileAndShowGoals() {
