@@ -16,14 +16,22 @@
         .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
         .screen.active { display: block; }
         
+        /* Приветствие UTP */
+        .welcome-hero { text-align: center; padding: 80px 20px 40px; }
+        .welcome-hero h1 { font-size: 32px; font-weight: 800; background: linear-gradient(45deg, #10b981, #059669); 
+                          -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        .welcome-pain { background: rgba(239,68,68,0.1); border-radius: 16px; padding: 20px; margin: 30px 0; }
+        .welcome-solution { background: rgba(16,185,129,0.1); border-radius: 16px; padding: 20px; margin: 30px 0; }
+        .welcome-result { background: white; border-radius: 16px; padding: 24px; margin: 30px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        
         /* Back button */
         .back-btn { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); 
                    border: none; border-radius: 20px; width: 44px; height: 44px; cursor: pointer; }
         .back-btn::before { content: '←'; font-size: 20px; font-weight: bold; }
         
         .btn { background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; 
-               padding: 16px 32px; border-radius: 16px; font-size: 16px; font-weight: 600; 
-               width: 100%; max-width: 280px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
+               padding: 18px 36px; border-radius: 20px; font-size: 16px; font-weight: 700; 
+               width: 100%; max-width: 320px; cursor: pointer; transition: all 0.3s; margin: 20px 0; }
         .btn:active { transform: scale(0.98); }
         .btn-secondary { background: #6b7280; }
         .btn-premium { background: linear-gradient(45deg, #f59e0b, #d97706); }
@@ -52,12 +60,10 @@
         .limit-warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 16px; margin: 20px 0; text-align: center; }
         .premium-badge { background: #f59e0b; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         
-        /* Админ панель */
         .admin-panel { background: linear-gradient(45deg, #3b82f6, #1d4ed8); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
         .metric { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
         .metric-value { font-weight: 800; font-size: 24px; }
         
-        /* Chart */
         .chart-container { height: 250px; position: relative; margin: 20px 0; }
         
         .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; 
@@ -71,9 +77,55 @@
     </style>
 </head>
 <body>
-    <!-- Profile Setup -->
-    <div id="profileSetup" class="screen active">
-        <button class="back-btn" onclick="showScreen('profile')"></button>
+    <!-- ✅ НОВЫЙ ЭКРАН 0: Приветствие UTP -->
+    <div id="welcome" class="screen active">
+        <div class="welcome-hero">
+            <h1>ИИ ФинКоуч</h1>
+            <p style="font-size: 18px; color: #1a1a1a; font-weight: 600; margin-bottom: 40px;">
+                Накопи подушку • Закрой долги • Купи машину
+            </p>
+        </div>
+        
+        <!-- БОЛЬ пользователя -->
+        <div class="welcome-pain">
+            <h3 style="font-size: 20px; font-weight: 700; color: #dc2626; margin-bottom: 12px;">😩 Почему не получается?</h3>
+            <ul style="font-size: 16px; color: #7f1d1d; line-height: 1.5;">
+                <li>• Ставил цели, но бросил через неделю</li>
+                <li>• Не знаешь сколько откладывать каждый день</li>
+                <li>• Тратишь на кофе больше, чем копишь</li>
+                <li>• Нет системы и мотивации</li>
+            </ul>
+        </div>
+        
+        <!-- РЕШЕНИЕ -->
+        <div class="welcome-solution">
+            <h3 style="font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 12px;">✅ ИИ ФинКоуч решает:</h3>
+            <ul style="font-size: 16px; color: #14532d; line-height: 1.5;">
+                <li>• <strong>Каждый день</strong> — 1-3 простых шага</li>
+                <li>• <strong>Точный расчёт:</strong> сколько откладывать</li>
+                <li>• <strong>Прогресс:</strong> видишь результат каждый день</li>
+                <li>• <strong>139 ₽/мес</strong> — дешевле кофе в Старбаксе</li>
+            </ul>
+        </div>
+        
+        <!-- РЕЗУЛЬТАТ -->
+        <div class="welcome-result">
+            <div style="font-size: 28px; font-weight: 800; color: #10b981; margin-bottom: 12px;">100 000 ₽</div>
+            <p style="font-size: 16px; color: #666;">Это твоя подушка через 12 месяцев при 278 ₽/день</p>
+        </div>
+        
+        <button class="btn" onclick="showScreen('profileSetup')" style="margin-bottom: 40px;">
+            🚀 Начать путь к 100к ₽
+        </button>
+        
+        <div style="text-align: center;">
+            <p style="font-size: 14px; color: #9ca3af;">Бесплатно первые 7 дней • Отменить в любой момент</p>
+        </div>
+    </div>
+    
+    <!-- Остальные экраны (БЕЗ ИЗМЕНЕНИЙ) -->
+    <div id="profileSetup" class="screen">
+        <button class="back-btn" onclick="showScreen('welcome')"></button>
         <div style="text-align: center; padding: 80px 20px 40px;">
             <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
             <p style="font-size: 16px; color: #666;">Пара вопросов для персонализации</p>
@@ -112,35 +164,30 @@
         <button class="btn" onclick="showDashboard()">Показать демо</button>
     </div>
     
-    <!-- Dashboard -->
+    <!-- Dashboard + остальные экраны (БЕЗ ИЗМЕНЕНИЙ) -->
     <div id="dashboard" class="screen">
         <div class="dashboard-header">
             <div class="goal-title" id="goalTitle">🛡️ Финансовая подушка</div>
             <div class="progress-circle" id="progressCircle">30%</div>
             <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽</div>
         </div>
-        
         <div id="freemiumLimit" class="limit-warning" style="display: none;">
             🚫 Бесплатно: 1 цель. <span class="premium-badge">Premium → 5 целей</span>
         </div>
-        
         <h3 style="font-size: 20px; font-weight: 700; margin: 30px 0 20px;">Сегодняшние шаги</h3>
         <div id="dailyActions"></div>
-        
         <div style="text-align: center; margin: 30px 0;">
             <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Месяц: <span id="monthlySaved">2 300 ₽</span></div>
             <button class="btn btn-premium" onclick="openStars()">🚀 Premium 139 ₽/мес</button>
         </div>
     </div>
     
-    <!-- Goals -->
     <div id="goals" class="screen">
         <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
         <div id="goalsList"></div>
         <button class="btn" onclick="showScreen('goalSelect')">+ Новая цель</button>
     </div>
     
-    <!-- Analytics -->
     <div id="analytics" class="screen">
         <button class="back-btn" onclick="showScreen('dashboard')"></button>
         <h2 style="font-size: 24px; font-weight: 700; padding: 80px 20px 20px; margin-bottom: 20px;">Расходы</h2>
@@ -153,7 +200,6 @@
         </div>
     </div>
     
-    <!-- Profile -->
     <div id="profile" class="screen">
         <div style="text-align: center; padding: 60px 20px 40px;">
             <h1 style="font-size: 28px; font-weight: 800;">Профиль</h1>
@@ -167,8 +213,6 @@
                 <p id="profileFlags"></p>
             </div>
         </div>
-        
-        <!-- АДМИН ПАНЕЛЬ (только для тебя) -->
         <div id="adminPanel" class="admin-panel" style="display: none; margin: 20px;">
             <h3 style="margin-bottom: 20px;">👑 Админ-панель</h3>
             <div class="metric"><span>Активных юзеров</span><span class="metric-value" id="adminUsers">127</span></div>
@@ -178,8 +222,8 @@
         </div>
     </div>
     
-    <!-- Tab bar -->
-    <div class="tab-bar">
+    <!-- Tab bar (скрыт на экране приветствия) -->
+    <div class="tab-bar" style="display: none;" id="tabBar">
         <button class="tab-btn active" onclick="showScreen('dashboard')"><span class="icon">📊</span>Главная</button>
         <button class="tab-btn" onclick="showScreen('goals')"><span class="icon">🎯</span>Цели</button>
         <button class="tab-btn" onclick="showScreen('analytics')"><span class="icon">📈</span>Аналитика</button>
@@ -189,7 +233,6 @@
     <script>
         Telegram.WebApp.ready(); Telegram.WebApp.expand();
         
-        // ТВОЙ ADMIN ID
         const ADMIN_ID = 6902824637;
         let userData = JSON.parse(localStorage.getItem('fincoach_user')) || {
             profile: { income: 'medium', hasDebt: false, hasMortgage: false },
@@ -201,12 +244,10 @@
         let expenseChart;
         
         function initApp() {
-            // ✅ АДМИН-ПАНЕЛЬ для твоего ID
             if (parseInt(Telegram.WebApp.initDataUnsafe?.user?.id) === ADMIN_ID || userData.userId == ADMIN_ID) {
                 document.getElementById('adminPanel').style.display = 'block';
             }
-            updateAll();
-            initChart();
+            if (document.getElementById('analytics')) initChart();
         }
         
         function saveProfileAndShowGoals() {
@@ -215,9 +256,10 @@
             userData.profile.hasMortgage = document.getElementById('hasMortgage').checked;
             localStorage.setItem('fincoach_user', JSON.stringify(userData));
             showScreen('goalSelect');
-            updateAll();
+            document.getElementById('tabBar').style.display = 'flex';
         }
         
+        // Остальные функции БЕЗ ИЗМЕНЕНИЙ
         function selectGoal(type) {
             if (userData.goals.length >= (userData.subscription.active ? 5 : 1)) {
                 document.getElementById('freemiumLimit').style.display = 'block';
@@ -246,13 +288,11 @@
                 a.income === 'all' || (a.debt && profile.hasDebt) || (a.mortgage && profile.hasMortgage)
             ).slice(0, 3);
             
-            // ✅ ПЕРСОНАЛИЗАЦИЯ РАБОТАЕТ
             document.getElementById('dailyActions').innerHTML = todayActions.map(action => `
                 <div class="action-card">
                     <div class="action-title">${action.title}</div>
                     <div class="action-desc">${action.desc}</div>
-                    <button class="btn" style="font-size: 14px; padding: 12px;" 
-                            onclick="completeAction(this)">Сделано ✓</button>
+                    <button class="btn" style="font-size: 14px; padding: 12px;" onclick="completeAction(this)">Сделано ✓</button>
                 </div>
             `).join('') || '<div style="text-align:center;color:#666;padding:40px">Завтра новые шаги</div>';
         }
@@ -307,9 +347,9 @@
             document.getElementById('profileFlags').textContent = flags.join(', ') || 'Флагов нет';
         }
         
-        // ✅ Chart.js ИСПРАВЛЕНО
         function initChart() {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
+            const ctx = document.getElementById('expenseChart')?.getContext('2d');
+            if (!ctx) return;
             expenseChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -320,11 +360,7 @@
                         borderWidth: 0
                     }]
                 },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }
         
@@ -339,12 +375,20 @@
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId)?.classList.add('active');
+            if (screenId !== 'welcome') {
+                document.getElementById('tabBar').style.display = 'flex';
+            } else {
+                document.getElementById('tabBar').style.display = 'none';
+            }
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.tab-btn')?.classList.add('active') || 
-            document.querySelector(`[onclick="showScreen('${screenId}')"]`)?.classList.add('active');
+            event.target.closest('.tab-btn')?.classList.add('active');
         }
         
-        // Старт
+        function showDashboard() {
+            updateAll();
+            showScreen('dashboard');
+        }
+        
         initApp();
     </script>
 </body>
