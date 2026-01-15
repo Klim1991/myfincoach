@@ -16,19 +16,26 @@
         .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
         .screen.active { display: block; }
         
+        /* Back button */
+        .back-btn { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); 
+                   border: none; border-radius: 20px; width: 44px; height: 44px; cursor: pointer; }
+        .back-btn::before { content: '←'; font-size: 20px; font-weight: bold; }
+        
         .btn { background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; 
                padding: 16px 32px; border-radius: 16px; font-size: 16px; font-weight: 600; 
                width: 100%; max-width: 280px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
         .btn:active { transform: scale(0.98); }
         .btn-secondary { background: #6b7280; }
         .btn-premium { background: linear-gradient(45deg, #f59e0b, #d97706); }
-        .btn-danger { background: #ef4444; }
         
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
         .form-group select, .form-group input { width: 100%; padding: 16px; border: 2px solid #e5e7eb; 
             border-radius: 12px; font-size: 16px; background: white; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: #10b981; }
+        .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .checkbox-group input[type="checkbox"] { width: auto; transform: scale(1.2); }
+        .checkbox-group label { font-weight: normal; }
         
         .dashboard-header { text-align: center; padding: 30px 0; }
         .goal-title { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
@@ -51,7 +58,7 @@
         .metric-value { font-weight: 800; font-size: 24px; }
         
         /* Chart */
-        #expenseChart { max-height: 250px; }
+        .chart-container { height: 250px; position: relative; margin: 20px 0; }
         
         .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; 
                    padding: 12px 20px; display: flex; gap: 10px; box-shadow: 0 -2px 20px rgba(0,0,0,0.1); }
@@ -66,7 +73,8 @@
 <body>
     <!-- Profile Setup -->
     <div id="profileSetup" class="screen active">
-        <div style="text-align: center; padding: 60px 20px;">
+        <button class="back-btn" onclick="showScreen('profile')"></button>
+        <div style="text-align: center; padding: 80px 20px 40px;">
             <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
             <p style="font-size: 16px; color: #666;">Пара вопросов для персонализации</p>
         </div>
@@ -85,12 +93,13 @@
         <div class="checkbox-group">
             <input type="checkbox" id="hasMortgage"> <label for="hasMortgage">Есть ипотека</label>
         </div>
-        <button class="btn" onclick="saveProfileAndShowGoals()">Продолжить к целям</button>
+        <button class="btn" onclick="saveProfileAndShowGoals()">Сохранить профиль</button>
     </div>
     
     <!-- Goal Select -->
     <div id="goalSelect" class="screen">
-        <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 40px 20px 20px;">С чего начнём?</h1>
+        <button class="back-btn" onclick="showScreen('goals')"></button>
+        <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 80px 20px 20px;">С чего начнём?</h1>
         <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
             <h3>🛡️ Финансовая подушка</h3><div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
         </div>
@@ -133,8 +142,11 @@
     
     <!-- Analytics -->
     <div id="analytics" class="screen">
-        <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Расходы</h2>
-        <canvas id="expenseChart"></canvas>
+        <button class="back-btn" onclick="showScreen('dashboard')"></button>
+        <h2 style="font-size: 24px; font-weight: 700; padding: 80px 20px 20px; margin-bottom: 20px;">Расходы</h2>
+        <div class="chart-container">
+            <canvas id="expenseChart"></canvas>
+        </div>
         <div style="padding: 20px; background: white; border-radius: 16px; margin: 20px;">
             <div style="font-size: 18px; font-weight: 600;">🍕 Доставка еды: 4 500 ₽</div>
             <div style="color: #666; font-size: 14px;">Сократи на 20% → +900 ₽ в копилку/мес</div>
@@ -149,7 +161,7 @@
         </div>
         <div style="padding: 0 20px;">
             <button class="btn btn-premium" onclick="openStars()">Управление подпиской</button>
-            <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить</button>
+            <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить профиль</button>
             <div style="margin-top: 30px;">
                 <p>Доход: <span id="profileIncome">40–70к ₽</span></p>
                 <p id="profileFlags"></p>
@@ -157,7 +169,8 @@
         </div>
         
         <!-- АДМИН ПАНЕЛЬ (только для тебя) -->
-        <div id="adminPanel" class="admin-panel" style="display: none;">
+        <div id="adminPanel" class="admin-panel" style="display: none; margin: 20px;">
+            <h3 style="margin-bottom: 20px;">👑 Админ-панель</h3>
             <div class="metric"><span>Активных юзеров</span><span class="metric-value" id="adminUsers">127</span></div>
             <div class="metric"><span>Premium</span><span class="metric-value" id="adminPremium">12</span></div>
             <div class="metric"><span>MRR</span><span class="metric-value" id="adminMRR">1 668 ₽</span></div>
@@ -181,16 +194,15 @@
         let userData = JSON.parse(localStorage.getItem('fincoach_user')) || {
             profile: { income: 'medium', hasDebt: false, hasMortgage: false },
             goals: [{ id: 1, type: 'pillow', title: 'Финансовая подушка', target: 100000, current: 30000 }],
-            actions: [], subscription: { active: false }, userId: Telegram.WebApp.initDataUnsafe.user?.id
+            actions: [], subscription: { active: false }, userId: Telegram.WebApp.initDataUnsafe?.user?.id || Date.now().toString()
         };
         
-        if (!userData.userId) userData.userId = Date.now().toString();
         localStorage.setItem('fincoach_user', JSON.stringify(userData));
-        
         let expenseChart;
         
         function initApp() {
-            if (Telegram.WebApp.initDataUnsafe.user?.id == ADMIN_ID) {
+            // ✅ АДМИН-ПАНЕЛЬ для твоего ID
+            if (parseInt(Telegram.WebApp.initDataUnsafe?.user?.id) === ADMIN_ID || userData.userId == ADMIN_ID) {
                 document.getElementById('adminPanel').style.display = 'block';
             }
             updateAll();
@@ -203,6 +215,7 @@
             userData.profile.hasMortgage = document.getElementById('hasMortgage').checked;
             localStorage.setItem('fincoach_user', JSON.stringify(userData));
             showScreen('goalSelect');
+            updateAll();
         }
         
         function selectGoal(type) {
@@ -233,6 +246,7 @@
                 a.income === 'all' || (a.debt && profile.hasDebt) || (a.mortgage && profile.hasMortgage)
             ).slice(0, 3);
             
+            // ✅ ПЕРСОНАЛИЗАЦИЯ РАБОТАЕТ
             document.getElementById('dailyActions').innerHTML = todayActions.map(action => `
                 <div class="action-card">
                     <div class="action-title">${action.title}</div>
@@ -293,6 +307,7 @@
             document.getElementById('profileFlags').textContent = flags.join(', ') || 'Флагов нет';
         }
         
+        // ✅ Chart.js ИСПРАВЛЕНО
         function initChart() {
             const ctx = document.getElementById('expenseChart').getContext('2d');
             expenseChart = new Chart(ctx, {
@@ -301,21 +316,20 @@
                     labels: ['🍕 Еда', '🚗 Транспорт', '🏠 ЖКХ', '💳 Кредиты', '🎯 Прочее'],
                     datasets: [{
                         data: [4500, 3200, 2800, 1500, 4200],
-                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6b7280']
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6b7280'],
+                        borderWidth: 0
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
             });
         }
         
         function openStars() {
-            if (userData.subscription.active) {
-                Telegram.WebApp.showAlert('✅ Premium активна!');
-            } else {
-                Telegram.WebApp.showAlert('Premium 139 ₽/мес\n\n• 5 целей\n• Полная аналитика\n• Персональные советы\n\nСкоро Telegram Stars!');
-                // userData.subscription.active = true; // для теста
-                // localStorage.setItem('fincoach_user', JSON.stringify(userData));
-            }
+            Telegram.WebApp.showAlert('Premium 139 ₽/мес (ЮKassa скоро)\n\n• 5 целей\n• Полная аналитика\n• Персональные советы');
         }
         
         function sendPushAll() {
@@ -326,7 +340,8 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId)?.classList.add('active');
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.tab-btn')?.classList.add('active');
+            event.target.closest('.tab-btn')?.classList.add('active') || 
+            document.querySelector(`[onclick="showScreen('${screenId}')"]`)?.classList.add('active');
         }
         
         // Старт
