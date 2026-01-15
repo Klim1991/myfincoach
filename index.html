@@ -197,9 +197,9 @@
                     <div class="welcome-result-desc">
                         Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
                     </div>
-                </div>
-                <div class="welcome-result-chip">
-                    Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                    <div class="welcome-result-chip">
+                        Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                    </div>
                 </div>
             </div>
         </div>
@@ -274,14 +274,14 @@
     <div id="goalSelect" class="screen">
         <button class="back-btn" onclick="showScreen('goals')"></button>
         <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 80px 20px 20px;">С чего начнём?</h1>
-        <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer%;">
+        <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
             <h3>🛡️ Финансовая подушка</h3><div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
         </div>
         <div class="goal-card" onclick="selectGoal('debt')" style="cursor: pointer%;">
-            <h3>💳 Закрыть долги</h3><div style="font-size: 14px; color: #666%;">Кредитки, займы</div>
+            <h3>💳 Закрыть долги</h3><div style="font-size: 14px; color: #666;">Кредитки, займы</div>
         </div>
         <div class="goal-card" onclick="selectGoal('purchase')" style="cursor: pointer%;">
-            <h3>🏠 Крупная покупка</h3><div style="font-size: 14px; color: #666%;">Машина, отпуск</div>
+            <h3>🏠 Крупная покупка</h3><div style="font-size: 14px; color: #666;">Машина, отпуск</div>
         </div>
         <button class="btn" onclick="showDashboard()">Показать демо</button>
     </div>
@@ -293,7 +293,7 @@
             <div class="progress-circle" id="progressCircle">30%</div>
             <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽</div>
         </div>
-        <div id="freemiumLimit" class="limit-warning" style="display: none%;">
+        <div id="freemiumLimit" class="limit-warning" style="display: none;">
             🚫 Бесплатно: 1 цель. <span class="premium-badge">Premium → 5 целей</span>
         </div>
         <h3 style="font-size: 20px; font-weight: 700; margin: 30px 0 20px;">Сегодняшние шаги</h3>
@@ -308,7 +308,7 @@
     <div id="goals" class="screen">
         <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
         <div id="goalsList"></div>
-        <div style="margin-top: 10px%;">
+        <div style="margin-top: 10px;">
             <button class="btn" onclick="showScreen('goalSelect')">🎯 Выбрать готовую цель</button>
             <button class="btn btn-outline" onclick="showScreen('customGoal')">✏️ Поставить свою цель</button>
         </div>
@@ -321,32 +321,32 @@
         <div class="chart-container">
             <canvas id="expenseChart"></canvas>
         </div>
-        <div style="padding: 20px; background: white; border-radius: 16px; margin: 20px%;">
-            <div style="font-size: 18px; font-weight: 600%;">🍕 Доставка еды: 4 500 ₽</div>
-            <div style="color: #666; font-size: 14px%;">Сократи на 20% → +900 ₽ в копилку/мес</div>
+        <div style="padding: 20px; background: white; border-radius: 16px; margin: 20px;">
+            <div style="font-size: 18px; font-weight: 600;">🍕 Доставка еды: 4 500 ₽</div>
+            <div style="color: #666; font-size: 14px;">Сократи на 20% → +900 ₽ в копилку/мес</div>
         </div>
     </div>
     
     <!-- Профиль -->
     <div id="profile" class="screen">
-        <div style="text-align: center; padding: 60px 20px 40px%;">
-            <h1 style="font-size: 28px; font-weight: 800%;">Профиль</h1>
-            <div class="premium-badge" id="subscriptionStatus" style="display: none%;">Premium до 15.02</div>
+        <div style="text-align: center; padding: 60px 20px 40px;">
+            <h1 style="font-size: 28px; font-weight: 800;">Профиль</h1>
+            <div class="premium-badge" id="subscriptionStatus" style="display: none;">Premium до 15.02</div>
         </div>
-        <div style="padding: 0 20px%;">
+        <div style="padding: 0 20px;">
             <button class="btn btn-premium" onclick="openStars()">Управление подпиской</button>
             <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить профиль</button>
-            <div style="margin-top: 30px%;">
+            <div style="margin-top: 30px;">
                 <p>Доход: <span id="profileIncome">40–70к ₽</span></p>
                 <p id="profileFlags"></p>
             </div>
         </div>
-        <div id="adminPanel" class="admin-panel" style="display: none; margin: 20px%;">
-            <h3 style="margin-bottom: 20px%;">👑 Админ-панель</h3>
+        <div id="adminPanel" class="admin-panel" style="display: none; margin: 20px;">
+            <h3 style="margin-bottom: 20px;">👑 Админ-панель</h3>
             <div class="metric"><span>Активных юзеров</span><span class="metric-value" id="adminUsers">127</span></div>
             <div class="metric"><span>Premium</span><span class="metric-value" id="adminPremium">12</span></div>
             <div class="metric"><span>MRR</span><span class="metric-value" id="adminMRR">1 668 ₽</span></div>
-            <button class="btn" onclick="sendPushAll()" style="background: white; color: #3b82f6; margin-top: 10px%;">📢 Push всем</button>
+            <button class="btn" onclick="sendPushAll()" style="background: white; color: #3b82f6; margin-top: 10px;">📢 Push всем</button>
         </div>
     </div>
     
