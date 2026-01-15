@@ -31,10 +31,15 @@
         
         .btn { background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; 
                padding: 18px 36px; border-radius: 20px; font-size: 16px; font-weight: 700; 
-               width: 100%; max-width: 320px; cursor: pointer; transition: all 0.3s; margin: 20px 0; }
+               width: 100%; max-width: 320px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
         .btn:active { transform: scale(0.98); }
         .btn-secondary { background: #6b7280; }
         .btn-premium { background: linear-gradient(45deg, #f59e0b, #d97706); }
+        .btn-outline { 
+            background: transparent; 
+            color: #10b981; 
+            border: 2px solid #10b981;
+        }
         
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
@@ -77,7 +82,7 @@
     </style>
 </head>
 <body>
-    <!-- ✅ ЭКРАН 0: Приветствие UTP -->
+    <!-- ЭКРАН 0: Приветствие UTP -->
     <div id="welcome" class="screen active">
         <div class="welcome-hero">
             <h1>ИИ ФинКоуч</h1>
@@ -182,7 +187,7 @@
         <button class="btn" onclick="saveCustomGoal()">Сохранить цель</button>
     </div>
     
-    <!-- Goal Select -->
+    <!-- Goal Select (готовые пакеты) -->
     <div id="goalSelect" class="screen">
         <button class="back-btn" onclick="showScreen('goals')"></button>
         <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 80px 20px 20px;">С чего начнём?</h1>
@@ -220,7 +225,10 @@
     <div id="goals" class="screen">
         <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
         <div id="goalsList"></div>
-        <button class="btn" onclick="openNewGoal()">+ Новая цель</button>
+        <div style="margin-top: 10px;">
+            <button class="btn" onclick="showScreen('goalSelect')">🎯 Выбрать готовую цель</button>
+            <button class="btn btn-outline" onclick="showScreen('customGoal')">✏️ Поставить свою цель</button>
+        </div>
     </div>
     
     <!-- Аналитика -->
@@ -295,15 +303,6 @@
             localStorage.setItem('fincoach_user', JSON.stringify(userData));
             showScreen('goalSelect');
             document.getElementById('tabBar').style.display = 'flex';
-        }
-
-        function openNewGoal() {
-            const useCustom = confirm('Создать свою цель?\n\nOK — своя цель\nОтмена — выбрать из готовых пакетов');
-            if (useCustom) {
-                showScreen('customGoal');
-            } else {
-                showScreen('goalSelect');
-            }
         }
         
         function selectGoal(type) {
