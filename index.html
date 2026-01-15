@@ -86,26 +86,36 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .welcome-result-amount {
             font-size: 26px; 
             font-weight: 800; 
             color: #22c55e;
         }
-        .welcome-result-chip {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: rgba(15,23,42,0.8);
-            border: 1px solid rgba(148,163,184,0.7);
-        }
         .welcome-result-desc {
             font-size: 13px; 
             color: #cbd5f5;
-            margin-bottom: 6px;
+        }
+
+        /* Новый нижний бейдж под блоком суммы */
+        .welcome-result-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(15,118,110,0.08);
+            border: 1px solid rgba(45,212,191,0.85);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #0b7660;
+            box-shadow: 0 8px 18px rgba(15,116,110,0.18);
+            margin-top: 4px;
+            text-align: center;
         }
 
         /* Back button */
@@ -189,18 +199,22 @@
             </div>
         </div>
         
-        <!-- РЕЗУЛЬТАТ + короткая боль/решение -->
+        <!-- РЕЗУЛЬТАТ + боль/решение -->
         <div class="welcome-result">
             <div class="welcome-result-main">
                 <div>
                     <div class="welcome-result-amount">100 000 ₽</div>
-                    <div class="welcome-result-desc">
-                        Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
-                    </div>
-                    <div class="welcome-result-chip">
-                        Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
-                    </div>
                 </div>
+            </div>
+            <div class="welcome-result-desc">
+                Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
+            </div>
+        </div>
+
+        <!-- Вынесенный бейдж под блоком -->
+        <div style="display:flex; justify-content:center;">
+            <div class="welcome-result-badge">
+                Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
             </div>
         </div>
         
@@ -277,10 +291,10 @@
         <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
             <h3>🛡️ Финансовая подушка</h3><div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
         </div>
-        <div class="goal-card" onclick="selectGoal('debt')" style="cursor: pointer%;">
+        <div class="goal-card" onclick="selectGoal('debt')" style="cursor: pointer;">
             <h3>💳 Закрыть долги</h3><div style="font-size: 14px; color: #666;">Кредитки, займы</div>
         </div>
-        <div class="goal-card" onclick="selectGoal('purchase')" style="cursor: pointer%;">
+        <div class="goal-card" onclick="selectGoal('purchase')" style="cursor: pointer;">
             <h3>🏠 Крупная покупка</h3><div style="font-size: 14px; color: #666;">Машина, отпуск</div>
         </div>
         <button class="btn" onclick="showDashboard()">Показать демо</button>
