@@ -46,17 +46,26 @@
             position: relative;
         }
 
-        /* НОВОЕ: иконка-копилка над бейджем доверия */
-        .welcome-hero-icon {
-            font-size: 40px;
+        /* ЛОГО: инициал "ФК" в круге */
+        .welcome-hero-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #0f172a;
+            color: #f9fafb;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.04em;
             margin-bottom: 16px;
-            display: inline-block;
-            filter: drop-shadow(0 6px 14px rgba(22,163,74,0.35));
+            box-shadow: 0 8px 18px rgba(15,23,42,0.25);
             opacity: 0;
             transform: translateY(12px) scale(0.96);
             transition: opacity 260ms ease-out, transform 260ms ease-out;
         }
-        .welcome-hero-icon.visible {
+        .welcome-hero-logo.visible {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
@@ -76,6 +85,13 @@
             color: #0b7660;
             margin-bottom: 18px;
             box-shadow: 0 10px 22px rgba(15,116,110,0.22);
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+            transition: opacity 260ms ease-out, transform 260ms ease-out;
+        }
+        .welcome-badge.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
         .welcome-badge span.icon {
             font-size: 18px;
@@ -280,10 +296,12 @@
     <!-- ЭКРАН 0: Приветствие UTP -->
     <div id="welcome" class="screen active">
         <div class="welcome-hero">
-            <!-- НОВОЕ: верхний значок-копилка -->
-            <div id="welcomeHeroIcon" class="welcome-hero-icon">🐖💰</div>
+            <!-- Лого сервиса: инициал "ФК" в круге -->
+            <div id="welcomeLogo" class="welcome-hero-logo">
+                <span>ФК</span>
+            </div>
 
-            <div class="welcome-badge fade-slide-soft" id="welcomeBadge">
+            <div class="welcome-badge" id="welcomeBadge">
                 <span class="icon">🛡️</span>
                 <span>Создано с участием финансовых специалистов</span>
             </div>
@@ -487,7 +505,7 @@
         let expenseChart;
 
         function animateWelcomeEntrance() {
-            const heroIcon = document.getElementById('welcomeHeroIcon'); // новая иконка
+            const logo = document.getElementById('welcomeLogo');
             const badge = document.getElementById('welcomeBadge');
             const title = document.getElementById('welcomeTitle');
             const subtitle = document.getElementById('welcomeSubtitle');
@@ -497,9 +515,8 @@
             const startBtn = document.getElementById('startBtn');
             const smallText = document.getElementById('welcomeSmallText');
 
+            // Появление остальных элементов (кроме лого и бейджа — их привяжем к прогрессу)
             const sequence = [
-                { el: heroIcon, delay: 0 },      // сначала иконка
-                { el: badge, delay: 80 },
                 { el: title, delay: 160 },
                 { el: subtitle, delay: 240 },
                 { el: tagline, delay: 320 },
@@ -514,34 +531,48 @@
                 setTimeout(() => {
                     item.el.classList.add('visible');
                     if (item.el === result) {
-                        // лёгкий glow карточки после появления
                         result.classList.add('welcome-result-glow');
                     }
                 }, item.delay);
             });
 
-            // Живой счётчик суммы — делаем медленнее и чуть плавнее
+            // Живой счётчик суммы + плавное проявление лого и бейджа
             const amountEl = document.getElementById('welcomeAmount');
             if (amountEl) {
                 const target = 100000;
-                const duration = 1400; // было 600, теперь медленнее
-                const startDelay = 260; // старт после короткой паузы
+                const duration = 1400;
+                const startDelay = 260;
                 const formatter = new Intl.NumberFormat('ru-RU');
                 let startTime = null;
+                let logoShown = false;
+                let badgeShown = false;
 
                 function tick(now) {
                     if (!startTime) startTime = now;
                     const elapsed = now - startTime;
                     const rawProgress = Math.min(elapsed / duration, 1);
-                    // лёгкая ease-out
                     const progress = 1 - Math.pow(1 - rawProgress, 2);
                     const current = Math.round(target * progress);
                     amountEl.textContent = formatter.format(current) + ' ₽';
+
+                    // Показываем логотип и бейдж примерно после половины пути счётчика
+                    if (progress > 0.35 && !logoShown) {
+                        logoShown = true;
+                        logo?.classList.add('visible');
+                    }
+                    if (progress > 0.45 && !badgeShown) {
+                        badgeShown = true;
+                        badge?.classList.add('visible');
+                    }
+
                     if (rawProgress < 1) {
                         requestAnimationFrame(tick);
                     } else {
                         amountEl.classList.add('swing-once');
                         setTimeout(() => amountEl.classList.remove('swing-once'), 260);
+                        // на всякий случай дожимаем, если прогресс не успел
+                        logo?.classList.add('visible');
+                        badge?.classList.add('visible');
                     }
                 }
 
@@ -579,7 +610,6 @@
             }
             if (document.getElementById('analytics')) initChart();
 
-            // Инициализация анимаций приветствия после лёгкой задержки
             setTimeout(animateWelcomeEntrance, 120);
         }
         
