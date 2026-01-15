@@ -10,42 +10,160 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: -apple-system, 'Segoe UI', sans-serif; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: radial-gradient(circle at top, #e0f2fe 0, #f5f7fa 40%, #c3cfe2 100%);
             min-height: 100vh; padding-bottom: 80px;
+            color: #0f172a;
         }
         .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
         .screen.active { display: block; }
         
         /* Приветствие UTP */
-        .welcome-hero { text-align: center; padding: 80px 20px 40px; }
-        .welcome-hero h1 { font-size: 32px; font-weight: 800; background: linear-gradient(45deg, #10b981, #059669); 
-                          -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
-        .welcome-pain { background: rgba(239,68,68,0.1); border-radius: 16px; padding: 20px; margin: 30px 0; }
-        .welcome-solution { background: rgba(16,185,129,0.1); border-radius: 16px; padding: 20px; margin: 30px 0; }
-        .welcome-result { background: white; border-radius: 16px; padding: 24px; margin: 30px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
-        
+        .welcome-hero { 
+            text-align: center; 
+            padding: 60px 20px 32px; 
+            position: relative;
+        }
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(15,118,110,0.06);
+            border: 1px solid rgba(45,212,191,0.6);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #0f766e;
+            margin-bottom: 12px;
+        }
+        .welcome-badge span.icon {
+            font-size: 14px;
+        }
+        .welcome-hero h1 { 
+            font-size: 30px; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, #0f172a, #0f766e); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: 12px;
+        }
+        .welcome-subtitle {
+            font-size: 15px;
+            color: #475569;
+            margin-bottom: 20px;
+        }
+        .welcome-tagline {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.04);
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 500;
+        }
+        .welcome-tagline span.dot {
+            opacity: 0.5;
+        }
+
+        .welcome-pain, .welcome-solution, .welcome-result {
+            border-radius: 18px; 
+            padding: 18px 16px; 
+            margin: 18px 0; 
+            backdrop-filter: blur(10px);
+        }
+        .welcome-pain { 
+            background: linear-gradient(135deg, rgba(248,113,113,0.08), rgba(239,68,68,0.08)); 
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+        .welcome-solution { 
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.06)); 
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+        .welcome-result { 
+            background: #0f172a; 
+            border: 1px solid rgba(148,163,184,0.5);
+            color: #e5e7eb;
+            box-shadow: 0 18px 45px rgba(15,23,42,0.45);
+        }
+        .welcome-pain h3, .welcome-solution h3 {
+            font-size: 17px; 
+            font-weight: 700; 
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .welcome-pain h3 { color: #b91c1c; }
+        .welcome-solution h3 { color: #166534; }
+        .welcome-pain ul, .welcome-solution ul {
+            font-size: 14px; 
+            line-height: 1.5;
+        }
+        .welcome-pain ul { color: #7f1d1d; }
+        .welcome-solution ul { color: #14532d; }
+
+        .welcome-result-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .welcome-result-amount {
+            font-size: 26px; 
+            font-weight: 800; 
+            color: #22c55e;
+        }
+        .welcome-result-chip {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.8);
+            border: 1px solid rgba(148,163,184,0.7);
+        }
+        .welcome-result-desc {
+            font-size: 13px; 
+            color: #cbd5f5;
+            margin-bottom: 10px;
+        }
+        .welcome-result-note {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
         /* Back button */
         .back-btn { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); 
-                   border: none; border-radius: 20px; width: 44px; height: 44px; cursor: pointer; }
+                   border: none; border-radius: 20px; width: 44px; height: 44px; cursor: pointer;
+                   box-shadow: 0 8px 20px rgba(15,23,42,0.15); }
         .back-btn::before { content: '←'; font-size: 20px; font-weight: bold; }
         
-        .btn { background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; 
-               padding: 18px 36px; border-radius: 20px; font-size: 16px; font-weight: 700; 
-               width: 100%; max-width: 320px; cursor: pointer; transition: all 0.3s; margin: 10px 0; }
-        .btn:active { transform: scale(0.98); }
-        .btn-secondary { background: #6b7280; }
-        .btn-premium { background: linear-gradient(45deg, #f59e0b, #d97706); }
+        .btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; 
+               padding: 18px 36px; border-radius: 18px; font-size: 16px; font-weight: 700; 
+               width: 100%; max-width: 340px; cursor: pointer; transition: all 0.2s; margin: 10px 0;
+               box-shadow: 0 14px 30px rgba(16,185,129,0.35);
+        }
+        .btn:active { transform: scale(0.97) translateY(1px); box-shadow: 0 8px 18px rgba(16,185,129,0.35); }
+        .btn-secondary { background: #6b7280; box-shadow: none; }
+        .btn-premium { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 12px 26px rgba(245,158,11,0.35); }
         .btn-outline { 
             background: transparent; 
-            color: #10b981; 
+            color: #0f766e; 
             border: 2px solid #10b981;
+            box-shadow: none;
         }
         
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+        .form-group label { display: block; font-weight: 600; color: #1f2933; margin-bottom: 8px; }
         .form-group select, .form-group input { width: 100%; padding: 16px; border: 2px solid #e5e7eb; 
             border-radius: 12px; font-size: 16px; background: white; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #10b981; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 1px rgba(16,185,129,0.3); }
         .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .checkbox-group input[type="checkbox"] { width: auto; transform: scale(1.2); }
         .checkbox-group label { font-weight: normal; }
@@ -85,49 +203,69 @@
     <!-- ЭКРАН 0: Приветствие UTP -->
     <div id="welcome" class="screen active">
         <div class="welcome-hero">
-            <h1>ИИ ФинКоуч</h1>
-            <p style="font-size: 18px; color: #1a1a1a; font-weight: 600; margin-bottom: 8px;">
-                Накопи подушку • Закрой долги • Купи машину
+            <div class="welcome-badge">
+                <span class="icon">🛡️</span>
+                <span>Создано с участием финансовых специалистов</span>
+            </div>
+            <h1>Наведи порядок в деньгах без стресса</h1>
+            <p class="welcome-subtitle">
+                ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
             </p>
-            <p style="font-size: 16px; color: #4b5563; margin-bottom: 40px;">
-                • Поставь свою цель
-            </p>
+            <div class="welcome-tagline">
+                <span>Накопи подушку</span><span class="dot">•</span>
+                <span>Закрой долги</span><span class="dot">•</span>
+                <span>Купи машину</span><span class="dot">•</span>
+                <span>Поставь свою цель</span>
+            </div>
         </div>
         
         <!-- БОЛЬ пользователя -->
         <div class="welcome-pain">
-            <h3 style="font-size: 20px; font-weight: 700; color: #dc2626; margin-bottom: 12px;">😩 Почему не получается?</h3>
-            <ul style="font-size: 16px; color: #7f1d1d; line-height: 1.5;">
-                <li>• Ставил цели, но бросил через неделю</li>
-                <li>• Не знаешь сколько откладывать каждый день</li>
-                <li>• Тратишь на кофе больше, чем копишь</li>
-                <li>• Нет системы и мотивации</li>
+            <h3>😩 Знакомо?</h3>
+            <ul>
+                <li>• Хочешь копить, но каждый месяц «что-то идёт не так».</li>
+                <li>• Боишься открыть банковское приложение и видеть минус.</li>
+                <li>• Ставил цели, но бросал через пару недель.</li>
+                <li>• Не понимаешь, сколько можно тратить, чтобы всё успеть.</li>
             </ul>
         </div>
         
         <!-- РЕШЕНИЕ -->
         <div class="welcome-solution">
-            <h3 style="font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 12px;">✅ ИИ ФинКоуч решает:</h3>
-            <ul style="font-size: 16px; color: #14532d; line-height: 1.5;">
-                <li>• <strong>Каждый день</strong> — 1-3 простых шага</li>
-                <li>• <strong>Точный расчёт:</strong> сколько откладывать</li>
-                <li>• <strong>Прогресс:</strong> видишь результат каждый день</li>
-                <li>• <strong>139 ₽/мес</strong> — дешевле кофе в Старбаксе</li>
+            <h3>✅ Что делает ИИ ФинКоуч</h3>
+            <ul>
+                <li>• Собирает твои цели и доходы в одну понятную картинку.</li>
+                <li>• Считает, сколько откладывать в день и месяц без боли для кошелька.</li>
+                <li>• Даёт 1–3 простых шага в день, а не «100 правил финансовой грамотности».</li>
+                <li>• Напоминает о целях, когда ты начинаешь про них забывать.</li>
             </ul>
         </div>
         
         <!-- РЕЗУЛЬТАТ -->
         <div class="welcome-result">
-            <div style="font-size: 28px; font-weight: 800; color: #10b981; margin-bottom: 12px;">100 000 ₽</div>
-            <p style="font-size: 16px; color: #666;">Это твоя подушка через 12 месяцев при 278 ₽/день</p>
+            <div class="welcome-result-main">
+                <div>
+                    <div class="welcome-result-amount">100 000 ₽</div>
+                    <div class="welcome-result-desc">
+                        Подушка безопасности за 12 месяцев при взносе всего 278 ₽ в день.
+                    </div>
+                </div>
+                <div class="welcome-result-chip">
+                    Реальный план, а не мечта
+                </div>
+            </div>
+            <div class="welcome-result-note">
+                Ты просто отвечаешь на вопросы и выполняешь маленькие шаги — мы считаем и ведём к цели.
+            </div>
         </div>
         
-        <button class="btn" onclick="showScreen('profileSetup')" style="margin-bottom: 40px;">
-            🚀 Начать путь к 100к ₽
-        </button>
-        
-        <div style="text-align: center;">
-            <p style="font-size: 14px; color: #9ca3af;">Бесплатно первые 7 дней • Отменить в любой момент</p>
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
+            <button class="btn" onclick="showScreen('profileSetup')" style="margin-bottom: 8px;">
+                🚀 Начать путь к своей цели
+            </button>
+            <p style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
+                7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
+            </p>
         </div>
     </div>
     
@@ -136,7 +274,7 @@
         <button class="back-btn" onclick="showScreen('welcome')"></button>
         <div style="text-align: center; padding: 80px 20px 40px;">
             <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
-            <p style="font-size: 16px; color: #666;">Пара вопросов для персонализации</p>
+            <p style="font-size: 16px; color: #666;">Пара вопросов, чтобы ИИ подстроился под тебя</p>
         </div>
         <div class="form-group">
             <label>Доход</label>
@@ -161,7 +299,7 @@
         <button class="back-btn" onclick="showScreen('goals')"></button>
         <div style="text-align: center; padding: 80px 20px 20px;">
             <h1 style="font-size: 24px; font-weight: 800;">Своя цель</h1>
-            <p style="font-size: 14px; color: #666;">Укажи, к чему хочешь прийти</p>
+            <p style="font-size: 14px; color: #666;">Укажи, к чему хочешь прийти — цифрами и сроком</p>
         </div>
 
         <div class="form-group">
@@ -210,7 +348,7 @@
             <div class="progress-circle" id="progressCircle">30%</div>
             <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽</div>
         </div>
-        <div id="freemiumLimit" class="limit-warning" style="display: none;">
+        <div id="freemiumLimit" class="limit-warning" style="display: none%;">
             🚫 Бесплатно: 1 цель. <span class="premium-badge">Premium → 5 целей</span>
         </div>
         <h3 style="font-size: 20px; font-weight: 700; margin: 30px 0 20px;">Сегодняшние шаги</h3>
