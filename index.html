@@ -45,6 +45,22 @@
             padding: 72px 20px 36px; 
             position: relative;
         }
+
+        /* НОВОЕ: иконка-копилка над бейджем доверия */
+        .welcome-hero-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            display: inline-block;
+            filter: drop-shadow(0 6px 14px rgba(22,163,74,0.35));
+            opacity: 0;
+            transform: translateY(12px) scale(0.96);
+            transition: opacity 260ms ease-out, transform 260ms ease-out;
+        }
+        .welcome-hero-icon.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
         .welcome-badge {
             display: inline-flex;
             align-items: center;
@@ -264,6 +280,9 @@
     <!-- ЭКРАН 0: Приветствие UTP -->
     <div id="welcome" class="screen active">
         <div class="welcome-hero">
+            <!-- НОВОЕ: верхний значок-копилка -->
+            <div id="welcomeHeroIcon" class="welcome-hero-icon">🐖💰</div>
+
             <div class="welcome-badge fade-slide-soft" id="welcomeBadge">
                 <span class="icon">🛡️</span>
                 <span>Создано с участием финансовых специалистов</span>
@@ -468,6 +487,7 @@
         let expenseChart;
 
         function animateWelcomeEntrance() {
+            const heroIcon = document.getElementById('welcomeHeroIcon'); // новая иконка
             const badge = document.getElementById('welcomeBadge');
             const title = document.getElementById('welcomeTitle');
             const subtitle = document.getElementById('welcomeSubtitle');
@@ -478,14 +498,15 @@
             const smallText = document.getElementById('welcomeSmallText');
 
             const sequence = [
-                { el: badge, delay: 0 },
-                { el: title, delay: 90 },
-                { el: subtitle, delay: 180 },
-                { el: tagline, delay: 260 },
-                { el: result, delay: 340 },
-                { el: bottomBadge, delay: 430 },
-                { el: startBtn, delay: 520 },
-                { el: smallText, delay: 580 }
+                { el: heroIcon, delay: 0 },      // сначала иконка
+                { el: badge, delay: 80 },
+                { el: title, delay: 160 },
+                { el: subtitle, delay: 240 },
+                { el: tagline, delay: 320 },
+                { el: result, delay: 400 },
+                { el: bottomBadge, delay: 480 },
+                { el: startBtn, delay: 560 },
+                { el: smallText, delay: 620 }
             ];
 
             sequence.forEach(item => {
