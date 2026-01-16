@@ -2,22 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ИИ ФинКоуч</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --app-height: 100vh;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* Фиксируем высоту и убираем скролл */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body { 
             font-family: -apple-system, 'Segoe UI', sans-serif; 
             background: radial-gradient(circle at top, #e0f2fe 0, #f5f7fa 40%, #c3cfe2 100%);
-            min-height: 100vh; padding-bottom: 80px;
+            height: var(--app-height);
             color: #0f172a;
         }
-        .screen { display: none; min-height: 100vh; padding: 20px; max-width: 400px; margin: 0 auto; }
+
+        /* Общий контейнер под весь экран mini-app */
+        .app-root {
+            position: relative;
+            width: 100%;
+            height: var(--app-height);
+            max-width: 400px;
+            margin: 0 auto;
+            padding-bottom: 72px; /* под таб-бар */
+        }
+
+        .screen { 
+            display: none; 
+            position: absolute;
+            inset: 0;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         .screen.active { display: block; }
 
-        /* Базовая анимация появления блока */
         .fade-slide-up {
             opacity: 0;
             transform: translateY(16px);
@@ -28,7 +56,6 @@
             transform: translateY(0);
         }
 
-        /* Добавим чуть более мягкую анимацию для ключевых элементов welcome */
         .fade-slide-soft {
             opacity: 0;
             transform: translateY(18px) scale(0.98);
@@ -39,14 +66,12 @@
             transform: translateY(0) scale(1);
         }
 
-        /* Приветствие UTP */
         .welcome-hero { 
             text-align: center; 
             padding: 72px 20px 36px; 
             position: relative;
         }
 
-        /* ЛОГО: инициал "ФК" в круге */
         .welcome-hero-logo {
             display: inline-flex;
             align-items: center;
@@ -106,7 +131,6 @@
             margin-bottom: 14px;
             transition: transform 280ms ease-out;
         }
-        /* лёгкий параллакс-эффект заголовка при входе */
         .welcome-hero-title-enter {
             transform: translateY(8px);
         }
@@ -166,7 +190,6 @@
             line-height: 1.45;
         }
 
-        /* мягкое дыхание для карточки результата после появления */
         @keyframes cardGlow {
             0% { box-shadow: 0 18px 45px rgba(15,23,42,0.45); transform: translateY(0); }
             50% { box-shadow: 0 22px 55px rgba(16,185,129,0.35); transform: translateY(-1px); }
@@ -176,7 +199,6 @@
             animation: cardGlow 2800ms ease-in-out 800ms 2;
         }
 
-        /* Нижний бейдж под блоком суммы */
         .welcome-result-badge {
             display: inline-flex;
             align-items: center;
@@ -197,10 +219,19 @@
             max-width: 360px;
         }
 
-        /* Back button */
-        .back-btn { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.9); 
-                   border: none; border-radius: 20px; width: 44px; height: 44px; cursor: pointer;
-                   box-shadow: 0 8px 20px rgba(15,23,42,0.15); }
+        .back-btn { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            background: rgba(255,255,255,0.9); 
+            border: none; 
+            border-radius: 20px; 
+            width: 44px; 
+            height: 44px; 
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(15,23,42,0.15); 
+            z-index: 10;
+        }
         .back-btn::before { content: '←'; font-size: 20px; font-weight: bold; }
         
         .btn { 
@@ -270,8 +301,20 @@
         
         .chart-container { height: 250px; position: relative; margin: 20px 0; }
         
-        .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; 
-                   padding: 12px 20px; display: flex; gap: 10px; box-shadow: 0 -2px 20px rgba(0,0,0,0.1); }
+        .tab-bar { 
+            position: fixed; 
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0; 
+            width: 100%;
+            max-width: 400px;
+            background: white; 
+            padding: 12px 20px; 
+            display: flex; 
+            gap: 10px; 
+            box-shadow: 0 -2px 20px rgba(0,0,0,0.1); 
+            z-index: 20;
+        }
         .tab-btn { flex: 1; border: none; background: none; padding: 12px 4px; font-size: 12px; color: #9ca3af; }
         .tab-btn.active { color: #10b981; font-weight: 600; }
         .tab-btn .icon { display: block; font-size: 20px; margin-bottom: 2px; }
@@ -279,7 +322,6 @@
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .screen.active { animation: slideIn 0.4s ease-out; }
 
-        /* «Кач» для суммы/бейджа при старте */
         @keyframes gentleSwing {
             0% { transform: translateY(0); }
             25% { transform: translateY(-3px); }
@@ -293,192 +335,191 @@
     </style>
 </head>
 <body>
-    <!-- ЭКРАН 0: Приветствие UTP -->
-    <div id="welcome" class="screen active">
-        <div class="welcome-hero">
-            <!-- Лого сервиса: инициал "ФК" в круге -->
-            <div id="welcomeLogo" class="welcome-hero-logo">
-                <span>ФК</span>
-            </div>
+    <div class="app-root">
+        <!-- ЭКРАН 0: Приветствие UTP -->
+        <div id="welcome" class="screen active">
+            <div class="welcome-hero">
+                <div id="welcomeLogo" class="welcome-hero-logo">
+                    <span>ФК</span>
+                </div>
 
-            <div class="welcome-badge" id="welcomeBadge">
-                <span class="icon">🛡️</span>
-                <span>Создано с участием финансовых специалистов</span>
-            </div>
-            <h1 class="fade-slide-soft welcome-hero-title-enter" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
-            <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
-                ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
-            </p>
-            <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
-                <span>Накопи подушку</span><span class="dot">•</span>
-                <span>Закрой долги</span><span class="dot">•</span>
-                <span>Купи машину</span><span class="dot">•</span>
-                <span>Поставь свою цель</span>
-            </div>
-        </div>
-        
-        <!-- РЕЗУЛЬТАТ + боль/решение -->
-        <div class="welcome-result fade-slide-soft" id="welcomeResult">
-            <div class="welcome-result-main">
-                <div>
-                    <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
+                <div class="welcome-badge" id="welcomeBadge">
+                    <span class="icon">🛡️</span>
+                    <span>Создано с участием финансовых специалистов</span>
+                </div>
+                <h1 class="fade-slide-soft welcome-hero-title-enter" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
+                <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
+                    ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
+                </p>
+                <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
+                    <span>Накопи подушку</span><span class="dot">•</span>
+                    <span>Закрой долги</span><span class="dot">•</span>
+                    <span>Купи машину</span><span class="dot">•</span>
+                    <span>Поставь свою цель</span>
                 </div>
             </div>
-            <div class="welcome-result-desc">
-                Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
+            
+            <div class="welcome-result fade-slide-soft" id="welcomeResult">
+                <div class="welcome-result-main">
+                    <div>
+                        <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
+                    </div>
+                </div>
+                <div class="welcome-result-desc">
+                    Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
+                </div>
             </div>
-        </div>
 
-        <!-- Вынесенный бейдж под блоком -->
-        <div style="display:flex; justify-content:center; margin-bottom: 4px;">
-            <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
-                Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+            <div style="display:flex; justify-content:center; margin-bottom: 4px;">
+                <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
+                    Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; align-items:center; margin-top:14px;">
+                <button class="btn fade-slide-soft" id="startBtn" onclick="onStartClick()" style="margin-bottom: 10px;">
+                    🚀 Начать путь к своей цели
+                </button>
+                <p class="fade-slide-up" id="welcomeSmallText" style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
+                    7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
+                </p>
             </div>
         </div>
         
-        <div style="display:flex; flex-direction:column; align-items:center; margin-top:14px;">
-            <button class="btn fade-slide-soft" id="startBtn" onclick="onStartClick()" style="margin-bottom: 10px;">
-                🚀 Начать путь к своей цели
-            </button>
-            <p class="fade-slide-up" id="welcomeSmallText" style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
-                7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
-            </p>
-        </div>
-    </div>
-    
-    <!-- Настройка профиля -->
-    <div id="profileSetup" class="screen">
-        <button class="back-btn" onclick="showScreen('welcome')"></button>
-        <div style="text-align: center; padding: 80px 20px 40px;">
-            <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
-            <p style="font-size: 16px; color: #666;">Пара вопросов, чтобы ИИ подстроился под тебя</p>
-        </div>
-        <div class="form-group">
-            <label>Доход</label>
-            <select id="incomeRange">
-                <option value="low">до 40 000 ₽</option>
-                <option value="medium" selected>40–70 000 ₽</option>
-                <option value="high">70–120 000 ₽</option>
-                <option value="veryhigh">120 000 ₽+</option>
-            </select>
-        </div>
-        <div class="checkbox-group">
-            <input type="checkbox" id="hasDebt"> <label for="hasDebt">Есть кредиты</label>
-        </div>
-        <div class="checkbox-group">
-            <input type="checkbox" id="hasMortgage"> <label for="hasMortgage">Есть ипотека</label>
-        </div>
-        <button class="btn" onclick="saveProfileAndShowGoals()">Сохранить профиль</button>
-    </div>
-
-    <!-- Своя цель -->
-    <div id="customGoal" class="screen">
-        <button class="back-btn" onclick="showScreen('goals')"></button>
-        <div style="text-align: center; padding: 80px 20px 20px;">
-            <h1 style="font-size: 24px; font-weight: 800;">Своя цель</h1>
-            <p style="font-size: 14px; color: #666;">Укажи, к чему хочешь прийти — цифрами и сроком</p>
+        <!-- Настройка профиля -->
+        <div id="profileSetup" class="screen">
+            <button class="back-btn" onclick="showScreen('welcome')"></button>
+            <div style="text-align: center; padding: 80px 20px 40px;">
+                <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
+                <p style="font-size: 16px; color: #666;">Пара вопросов, чтобы ИИ подстроился под тебя</p>
+            </div>
+            <div class="form-group">
+                <label>Доход</label>
+                <select id="incomeRange">
+                    <option value="low">до 40 000 ₽</option>
+                    <option value="medium" selected>40–70 000 ₽</option>
+                    <option value="high">70–120 000 ₽</option>
+                    <option value="veryhigh">120 000 ₽+</option>
+                </select>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="hasDebt"> <label for="hasDebt">Есть кредиты</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="hasMortgage"> <label for="hasMortgage">Есть ипотека</label>
+            </div>
+            <button class="btn" onclick="saveProfileAndShowGoals()">Сохранить профиль</button>
         </div>
 
-        <div class="form-group">
-            <label for="customGoalTitle">Название цели</label>
-            <input id="customGoalTitle" type="text" placeholder="Например: Первый взнос на авто">
-        </div>
+        <!-- Своя цель -->
+        <div id="customGoal" class="screen">
+            <button class="back-btn" onclick="showScreen('goals')"></button>
+            <div style="text-align: center; padding: 80px 20px 20px;">
+                <h1 style="font-size: 24px; font-weight: 800;">Своя цель</h1>
+                <p style="font-size: 14px; color: #666;">Укажи, к чему хочешь прийти — цифрами и сроком</p>
+            </div>
 
-        <div class="form-group">
-            <label for="customGoalTarget">Сумма цели (₽)</label>
-            <input id="customGoalTarget" type="number" min="1" placeholder="Например: 300000">
-        </div>
+            <div class="form-group">
+                <label for="customGoalTitle">Название цели</label>
+                <input id="customGoalTitle" type="text" placeholder="Например: Первый взнос на авто">
+            </div>
 
-        <div class="form-group">
-            <label for="customGoalCurrent">Уже накоплено (₽, можно не заполнять)</label>
-            <input id="customGoalCurrent" type="number" min="0" placeholder="Например: 20000">
-        </div>
+            <div class="form-group">
+                <label for="customGoalTarget">Сумма цели (₽)</label>
+                <input id="customGoalTarget" type="number" min="1" placeholder="Например: 300000">
+            </div>
 
-        <div class="form-group">
-            <label for="customGoalMonths">Срок достижения (месяцев)</label>
-            <input id="customGoalMonths" type="number" min="1" placeholder="Например: 12">
-        </div>
+            <div class="form-group">
+                <label for="customGoalCurrent">Уже накоплено (₽, можно не заполнять)</label>
+                <input id="customGoalCurrent" type="number" min="0" placeholder="Например: 20000">
+            </div>
 
-        <button class="btn" onclick="saveCustomGoal()">Сохранить цель</button>
-    </div>
-    
-    <!-- Goal Select (готовые пакеты) -->
-    <div id="goalSelect" class="screen">
-        <button class="back-btn" onclick="showScreen('goals')"></button>
-        <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 80px 20px 20px;">С чего начнём?</h1>
-        <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
-            <h3>🛡️ Финансовая подушка</h3><div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
+            <div class="form-group">
+                <label for="customGoalMonths">Срок достижения (месяцев)</label>
+                <input id="customGoalMonths" type="number" min="1" placeholder="Например: 12">
+            </div>
+
+            <button class="btn" onclick="saveCustomGoal()">Сохранить цель</button>
         </div>
-        <div class="goal-card" onclick="selectGoal('debt')" style="cursor: pointer;">
-            <h3>💳 Закрыть долги</h3><div style="font-size: 14px; color: #666;">Кредитки, займы</div>
+        
+        <!-- Goal Select -->
+        <div id="goalSelect" class="screen">
+            <button class="back-btn" onclick="showScreen('goals')"></button>
+            <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 80px 20px 20px;">С чего начнём?</h1>
+            <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
+                <h3>🛡️ Финансовая подушка</h3><div style="font-size: 14px; color: #666;">3–6 месяцев расходов</div>
+            </div>
+            <div class="goal-card" onclick="selectGoal('debt')" style="cursor: pointer;">
+                <h3>💳 Закрыть долги</h3><div style="font-size: 14px; color: #666;">Кредитки, займы</div>
+            </div>
+            <div class="goal-card" onclick="selectGoal('purchase')" style="cursor: pointer;">
+                <h3>🏠 Крупная покупка</h3><div style="font-size: 14px; color: #666;">Машина, отпуск</div>
+            </div>
+            <button class="btn" onclick="showDashboard()">Показать демо</button>
         </div>
-        <div class="goal-card" onclick="selectGoal('purchase')" style="cursor: pointer;">
-            <h3>🏠 Крупная покупка</h3><div style="font-size: 14px; color: #666;">Машина, отпуск</div>
-        </div>
-        <button class="btn" onclick="showDashboard()">Показать демо</button>
-    </div>
-    
-    <!-- Dashboard -->
-    <div id="dashboard" class="screen">
-        <div class="dashboard-header">
-            <div class="goal-title" id="goalTitle">🛡️ Финансовая подушка</div>
-            <div class="progress-circle" id="progressCircle">30%</div>
-            <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽</div>
-        </div>
-        <div id="freemiumLimit" class="limit-warning" style="display: none;">
-            🚫 Бесплатно: 1 цель. <span class="premium-badge">Premium → 5 целей</span>
-        </div>
-        <h3 style="font-size: 20px; font-weight: 700; margin: 30px 0 20px;">Сегодняшние шаги</h3>
-        <div id="dailyActions"></div>
-        <div style="text-align: center; margin: 30px 0;">
-            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Месяц: <span id="monthlySaved">2 300 ₽</span></div>
-            <button class="btn btn-premium" onclick="openStars()">🚀 Premium 139 ₽/мес</button>
-        </div>
-    </div>
-    
-    <!-- Цели -->
-    <div id="goals" class="screen">
-        <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
-        <div id="goalsList"></div>
-        <div style="margin-top: 10px;">
-            <button class="btn" onclick="showScreen('goalSelect')">🎯 Выбрать готовую цель</button>
-            <button class="btn btn-outline" onclick="showScreen('customGoal')">✏️ Поставить свою цель</button>
-        </div>
-    </div>
-    
-    <!-- Аналитика -->
-    <div id="analytics" class="screen">
-        <button class="back-btn" onclick="showScreen('dashboard')"></button>
-        <h2 style="font-size: 24px; font-weight: 700; padding: 80px 20px 20px; margin-bottom: 20px;">Расходы</h2>
-        <div class="chart-container">
-            <canvas id="expenseChart"></canvas>
-        </div>
-        <div style="padding: 20px; background: white; border-radius: 16px; margin: 20px;">
-            <div style="font-size: 18px; font-weight: 600;">🍕 Доставка еды: 4 500 ₽</div>
-            <div style="color: #666; font-size: 14px;">Сократи на 20% → +900 ₽ в копилку/мес</div>
-        </div>
-    </div>
-    
-    <!-- Профиль -->
-    <div id="profile" class="screen">
-        <div style="text-align: center; padding: 60px 20px 40px;">
-            <h1 style="font-size: 28px; font-weight: 800;">Профиль</h1>
-            <div class="premium-badge" id="subscriptionStatus" style="display: none;">Premium до 15.02</div>
-        </div>
-        <div style="padding: 0 20px;">
-            <button class="btn btn-premium" onclick="openStars()">Управление подпиской</button>
-            <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить профиль</button>
-            <div style="margin-top: 30px;">
-                <p>Доход: <span id="profileIncome">40–70к ₽</span></p>
-                <p id="profileFlags"></p>
+        
+        <!-- Dashboard -->
+        <div id="dashboard" class="screen">
+            <div class="dashboard-header">
+                <div class="goal-title" id="goalTitle">🛡️ Финансовая подушка</div>
+                <div class="progress-circle" id="progressCircle">30%</div>
+                <div class="progress-text" id="progressText">30 000 ₽ из 100 000 ₽</div>
+            </div>
+            <div id="freemiumLimit" class="limit-warning" style="display: none;">
+                🚫 Бесплатно: 1 цель. <span class="premium-badge">Premium → 5 целей</span>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; margin: 30px 0 20px;">Сегодняшние шаги</h3>
+            <div id="dailyActions"></div>
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Месяц: <span id="monthlySaved">2 300 ₽</span></div>
+                <button class="btn btn-premium" onclick="openStars()">🚀 Premium 139 ₽/мес</button>
             </div>
         </div>
-        <div id="adminPanel" class="admin-panel" style="display: none; margin: 20px;">
-            <h3 style="margin-bottom: 20px;">👑 Админ-панель</h3>
-            <div class="metric"><span>Активных юзеров</span><span class="metric-value" id="adminUsers">127</span></div>
-            <div class="metric"><span>Premium</span><span class="metric-value" id="adminPremium">12</span></div>
-            <div class="metric"><span>MRR</span><span class="metric-value" id="adminMRR">1 668 ₽</span></div>
-            <button class="btn" onclick="sendPushAll()" style="background: white; color: #3b82f6; margin-top: 10px;">📢 Push всем</button>
+        
+        <!-- Цели -->
+        <div id="goals" class="screen">
+            <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
+            <div id="goalsList"></div>
+            <div style="margin-top: 10px;">
+                <button class="btn" onclick="showScreen('goalSelect')">🎯 Выбрать готовую цель</button>
+                <button class="btn btn-outline" onclick="showScreen('customGoal')">✏️ Поставить свою цель</button>
+            </div>
+        </div>
+        
+        <!-- Аналитика -->
+        <div id="analytics" class="screen">
+            <button class="back-btn" onclick="showScreen('dashboard')"></button>
+            <h2 style="font-size: 24px; font-weight: 700; padding: 80px 20px 20px; margin-bottom: 20px;">Расходы</h2>
+            <div class="chart-container">
+                <canvas id="expenseChart"></canvas>
+            </div>
+            <div style="padding: 20px; background: white; border-radius: 16px; margin: 20px;">
+                <div style="font-size: 18px; font-weight: 600;">🍕 Доставка еды: 4 500 ₽</div>
+                <div style="color: #666; font-size: 14px;">Сократи на 20% → +900 ₽ в копилку/мес</div>
+            </div>
+        </div>
+        
+        <!-- Профиль -->
+        <div id="profile" class="screen">
+            <div style="text-align: center; padding: 60px 20px 40px;">
+                <h1 style="font-size: 28px; font-weight: 800;">Профиль</h1>
+                <div class="premium-badge" id="subscriptionStatus" style="display: none;">Premium до 15.02</div>
+            </div>
+            <div style="padding: 0 20px;">
+                <button class="btn btn-premium" onclick="openStars()">Управление подпиской</button>
+                <button class="btn btn-secondary" onclick="showScreen('profileSetup')">Настроить профиль</button>
+                <div style="margin-top: 30px;">
+                    <p>Доход: <span id="profileIncome">40–70к ₽</span></p>
+                    <p id="profileFlags"></p>
+                </div>
+            </div>
+            <div id="adminPanel" class="admin-panel" style="display: none; margin: 20px;">
+                <h3 style="margin-bottom: 20px;">👑 Админ-панель</h3>
+                <div class="metric"><span>Активных юзеров</span><span class="metric-value" id="adminUsers">127</span></div>
+                <div class="metric"><span>Premium</span><span class="metric-value" id="adminPremium">12</span></div>
+                <div class="metric"><span>MRR</span><span class="metric-value" id="adminMRR">1 668 ₽</span></div>
+                <button class="btn" onclick="sendPushAll()" style="background: white; color: #3b82f6; margin-top: 10px;">📢 Push всем</button>
+            </div>
         </div>
     </div>
     
@@ -491,9 +532,22 @@
     </div>
 
     <script>
+        function setAppHeight() {
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.viewportHeight) {
+                document.documentElement.style.setProperty('--app-height', tg.viewportHeight + 'px');
+            } else {
+                document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+            }
+        }
+
         Telegram.WebApp.ready(); 
         Telegram.WebApp.expand();
-        
+
+        setAppHeight();
+        window.Telegram?.WebApp?.onEvent?.('viewportChanged', setAppHeight);
+        window.addEventListener('resize', setAppHeight);
+
         const ADMIN_ID = 6902824637;
         let userData = JSON.parse(localStorage.getItem('fincoach_user')) || {
             profile: { income: 'medium', hasDebt: false, hasMortgage: false },
@@ -515,7 +569,6 @@
             const startBtn = document.getElementById('startBtn');
             const smallText = document.getElementById('welcomeSmallText');
 
-            // Появление остальных элементов (кроме лого и бейджа — их привяжем к прогрессу)
             const sequence = [
                 { el: title, delay: 160 },
                 { el: subtitle, delay: 240 },
@@ -536,7 +589,6 @@
                 }, item.delay);
             });
 
-            // Живой счётчик суммы + плавное проявление лого и бейджа
             const amountEl = document.getElementById('welcomeAmount');
             if (amountEl) {
                 const target = 100000;
@@ -555,7 +607,6 @@
                     const current = Math.round(target * progress);
                     amountEl.textContent = formatter.format(current) + ' ₽';
 
-                    // Показываем логотип и бейдж примерно после половины пути счётчика
                     if (progress > 0.35 && !logoShown) {
                         logoShown = true;
                         logo?.classList.add('visible');
@@ -570,7 +621,6 @@
                     } else {
                         amountEl.classList.add('swing-once');
                         setTimeout(() => amountEl.classList.remove('swing-once'), 260);
-                        // на всякий случай дожимаем, если прогресс не успел
                         logo?.classList.add('visible');
                         badge?.classList.add('visible');
                     }
