@@ -9,14 +9,14 @@
     <style>
         :root {
             --app-height: 100vh;
-            --tabbar-height: 72px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* Фиксируем высоту и убираем скролл у документа */
         html, body {
             height: 100%;
-            overflow: hidden; /* ВЕСЬ экран без скролла */
+            overflow: hidden;
         }
 
         body { 
@@ -26,37 +26,40 @@
             color: #0f172a;
         }
 
-        /* Корневой контейнер mini-app */
+        /* Общий контейнер под весь экран mini-app */
         .app-root {
             position: relative;
             width: 100%;
             height: var(--app-height);
             max-width: 400px;
             margin: 0 auto;
-            padding-bottom: var(--tabbar-height); /* место под таб-бар */
-            overflow: hidden; /* экраны внутри не вылезают и не двигают body */
+            padding-bottom: 72px; /* под таб-бар */
+            overflow: hidden; /* внутри не вылезаем наружу */
         }
 
-        /* Каждый экран растянут на весь app-root, без внешнего скролла */
         .screen { 
+            display: none; 
             position: absolute;
             inset: 0;
-            display: none;
-            /* Сам экран не скроллится, скроллим только внутренний контент */
-            overflow: hidden;
         }
         .screen.active { 
-            display: block; 
+            display: block;
             animation: slideIn 0.4s ease-out;
         }
 
-        /* Внутренний скроллируемый контент экрана */
-        .screen-inner {
+        /* Общий скролл-контейнер для всех экранов, КРОМЕ welcome */
+        .screen-scroll {
             position: absolute;
             inset: 0;
             padding: 20px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+        }
+
+        /* Приветственный экран — без скролла, контент просто центрируется */
+        #welcome {
+            overflow: hidden;      /* убираем локальный скролл */
+            padding: 20px;         /* свой паддинг, без scroll-контейнера */
         }
 
         .fade-slide-up {
@@ -125,7 +128,7 @@
             box-shadow: 0 10px 22px rgba(15,116,110,0.22);
             opacity: 0;
             transform: translateY(12px) scale(0.98);
-            transition: opacity 260ms ease-out, transform 260ms.ease-out;
+            transition: opacity 260ms ease-out, transform 260ms ease-out;
         }
         .welcome-badge.visible {
             opacity: 1;
@@ -164,10 +167,10 @@
             gap: 6px 10px;
             padding: 10px 16px;
             border-radius: 999px;
+            background: rgba(15,23,42,0.04);
             font-size: 13px;
             color: #0f172a;
             font-weight: 500;
-            background: rgba(15,23,42,0.04);
         }
         .welcome-tagline span.dot {
             opacity: 0.5;
@@ -348,61 +351,59 @@
 </head>
 <body>
     <div class="app-root">
-        <!-- ЭКРАН 0: Приветствие UTP -->
+        <!-- ЭКРАН 0: Приветствие UTP (без скролла) -->
         <div id="welcome" class="screen active">
-            <div class="screen-inner">
-                <div class="welcome-hero">
-                    <div id="welcomeLogo" class="welcome-hero-logo">
-                        <span>ФК</span>
-                    </div>
-
-                    <div class="welcome-badge" id="welcomeBadge">
-                        <span class="icon">🛡️</span>
-                        <span>Создано с участием финансовых специалистов</span>
-                    </div>
-                    <h1 class="fade-slide-soft welcome-hero-title-enter" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
-                    <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
-                        ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
-                    </p>
-                    <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
-                        <span>Накопи подушку</span><span class="dot">•</span>
-                        <span>Закрой долги</span><span class="dot">•</span>
-                        <span>Купи машину</span><span class="dot">•</span>
-                        <span>Поставь свою цель</span>
-                    </div>
-                </div>
-                
-                <div class="welcome-result fade-slide-soft" id="welcomeResult">
-                    <div class="welcome-result-main">
-                        <div>
-                            <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
-                        </div>
-                    </div>
-                    <div class="welcome-result-desc">
-                        Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
-                    </div>
+            <div class="welcome-hero">
+                <div id="welcomeLogo" class="welcome-hero-logo">
+                    <span>ФК</span>
                 </div>
 
-                <div style="display:flex; justify-content:center; margin-bottom: 4px;">
-                    <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
-                        Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                <div class="welcome-badge" id="welcomeBadge">
+                    <span class="icon">🛡️</span>
+                    <span>Создано с участием финансовых специалистов</span>
+                </div>
+                <h1 class="fade-slide-soft welcome-hero-title-enter" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
+                <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
+                    ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
+                </p>
+                <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
+                    <span>Накопи подушку</span><span class="dot">•</span>
+                    <span>Закрой долги</span><span class="dot">•</span>
+                    <span>Купи машину</span><span class="dot">•</span>
+                    <span>Поставь свою цель</span>
+                </div>
+            </div>
+            
+            <div class="welcome-result fade-slide-soft" id="welcomeResult">
+                <div class="welcome-result-main">
+                    <div>
+                        <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
                     </div>
                 </div>
-                
-                <div style="display:flex; flex-direction:column; align-items:center; margin-top:14px;">
-                    <button class="btn fade-slide-soft" id="startBtn" onclick="onStartClick()" style="margin-bottom: 10px;">
-                        🚀 Начать путь к своей цели
-                    </button>
-                    <p class="fade-slide-up" id="welcomeSmallText" style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
-                        7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
-                    </p>
+                <div class="welcome-result-desc">
+                    Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
                 </div>
+            </div>
+
+            <div style="display:flex; justify-content:center; margin-bottom: 4px;">
+                <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
+                    Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                </div>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; align-items:center; margin-top:14px;">
+                <button class="btn fade-slide-soft" id="startBtn" onclick="onStartClick()" style="margin-bottom: 10px;">
+                    🚀 Начать путь к своей цели
+                </button>
+                <p class="fade-slide-up" id="welcomeSmallText" style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
+                    7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
+                </p>
             </div>
         </div>
         
         <!-- Настройка профиля -->
         <div id="profileSetup" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <button class="back-btn" onclick="showScreen('welcome')"></button>
                 <div style="text-align: center; padding: 80px 20px 40px;">
                     <h1 style="font-size: 28px; font-weight: 800;">Настроим план</h1>
@@ -429,7 +430,7 @@
 
         <!-- Своя цель -->
         <div id="customGoal" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <button class="back-btn" onclick="showScreen('goals')"></button>
                 <div style="text-align: center; padding: 80px 20px 20px;">
                     <h1 style="font-size: 24px; font-weight: 800;">Своя цель</h1>
@@ -462,7 +463,7 @@
         
         <!-- Goal Select -->
         <div id="goalSelect" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <button class="back-btn" onclick="showScreen('goals')"></button>
                 <h1 style="font-size: 28px; font-weight: 800; text-align: center; padding: 80px 20px 20px;">С чего начнём?</h1>
                 <div class="goal-card" onclick="selectGoal('pillow')" style="cursor: pointer;">
@@ -480,7 +481,7 @@
         
         <!-- Dashboard -->
         <div id="dashboard" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <div class="dashboard-header">
                     <div class="goal-title" id="goalTitle">🛡️ Финансовая подушка</div>
                     <div class="progress-circle" id="progressCircle">30%</div>
@@ -500,7 +501,7 @@
         
         <!-- Цели -->
         <div id="goals" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <h2 style="font-size: 24px; font-weight: 700; padding: 20px; margin-bottom: 20px;">Твои цели</h2>
                 <div id="goalsList"></div>
                 <div style="margin-top: 10px;">
@@ -512,7 +513,7 @@
         
         <!-- Аналитика -->
         <div id="analytics" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <button class="back-btn" onclick="showScreen('dashboard')"></button>
                 <h2 style="font-size: 24px; font-weight: 700; padding: 80px 20px 20px; margin-bottom: 20px;">Расходы</h2>
                 <div class="chart-container">
@@ -527,7 +528,7 @@
         
         <!-- Профиль -->
         <div id="profile" class="screen">
-            <div class="screen-inner">
+            <div class="screen-scroll">
                 <div style="text-align: center; padding: 60px 20px 40px;">
                     <h1 style="font-size: 28px; font-weight: 800;">Профиль</h1>
                     <div class="premium-badge" id="subscriptionStatus" style="display: none;">Premium до 15.02</div>
