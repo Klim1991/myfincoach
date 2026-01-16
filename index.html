@@ -56,35 +56,22 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Приветственный экран — без скролла, контент просто центрируется */
+        /* Приветственный экран — без скролла, выравниваем содержимое по высоте */
         #welcome {
-            overflow: hidden;      /* убираем локальный скролл */
-            padding: 20px;         /* свой паддинг, без scroll-контейнера */
+            overflow: hidden;
+            padding: 20px;
         }
 
-        .fade-slide-up {
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 260ms ease-out, transform 260ms ease-out;
-        }
-        .fade-slide-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .fade-slide-soft {
-            opacity: 0;
-            transform: translateY(18px) scale(0.98);
-            transition: opacity 280ms ease-out, transform 280ms ease-out;
-        }
-        .fade-slide-soft.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+        .welcome-layout {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* верхний блок и низ равномерно */
         }
 
         .welcome-hero { 
             text-align: center; 
-            padding: 72px 20px 36px; 
+            padding: 48px 8px 16px; /* чуть меньше сверху, компактнее на маленьких экранах */
             position: relative;
         }
 
@@ -138,13 +125,13 @@
             font-size: 18px;
         }
         .welcome-hero h1 { 
-            font-size: 32px; 
+            font-size: 28px; 
             font-weight: 800; 
-            line-height: 1.15;
+            line-height: 1.2;
             background: linear-gradient(135deg, #0f172a, #0f766e); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             transition: transform 280ms ease-out;
         }
         .welcome-hero-title-enter {
@@ -155,10 +142,11 @@
         }
 
         .welcome-subtitle {
-            font-size: 15px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.4;
             color: #475569;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
+            padding: 0 8px;
         }
         .welcome-tagline {
             display: inline-flex;
@@ -176,10 +164,14 @@
             opacity: 0.5;
         }
 
+        .welcome-center-block {
+            padding: 0 4px;
+        }
+
         .welcome-result {
             border-radius: 20px; 
-            padding: 20px 18px; 
-            margin: 22px 0 14px; 
+            padding: 18px 16px; 
+            margin: 10px 0 10px; 
             backdrop-filter: blur(10px);
             background: #0f172a; 
             border: 1px solid rgba(148,163,184,0.5);
@@ -195,7 +187,7 @@
             margin-bottom: 6px;
         }
         .welcome-result-amount {
-            font-size: 28px; 
+            font-size: 26px; 
             font-weight: 800; 
             color: #22c55e;
             transition: transform 160ms ease-out;
@@ -235,6 +227,14 @@
             max-width: 360px;
         }
 
+        .welcome-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 12px;
+            gap: 8px;
+        }
+
         .back-btn { 
             position: absolute; 
             top: 20px; 
@@ -254,15 +254,15 @@
             background: linear-gradient(135deg, #10b981, #059669); 
             color: white; 
             border: none; 
-            padding: 18px 36px; 
+            padding: 16px 32px; 
             border-radius: 18px; 
             font-size: 16px; 
             font-weight: 700; 
             width: 100%; 
             max-width: 340px; 
             cursor: pointer; 
-            transition: transform 120ms ease-out, box-shadow 120ms ease-out, opacity 260ms ease-out, background 160ms ease-out;
-            margin: 10px 0;
+            transition: transform 120ms ease-out, box-shadow 120ms ease-out, opacity 260ms ease-out, background 160ms.ease-out;
+            margin: 6px 0;
             box-shadow: 0 14px 30px rgba(16,185,129,0.35);
         }
         .btn:active { 
@@ -347,57 +347,81 @@
         .swing-once {
             animation: gentleSwing 220ms ease-out;
         }
+
+        .fade-slide-up {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 260ms ease-out, transform 260ms ease-out;
+        }
+        .fade-slide-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-slide-soft {
+            opacity: 0;
+            transform: translateY(18px) scale(0.98);
+            transition: opacity 280ms ease-out, transform 280ms.ease-out;
+        }
+        .fade-slide-soft.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     </style>
 </head>
 <body>
     <div class="app-root">
-        <!-- ЭКРАН 0: Приветствие UTP (без скролла) -->
+        <!-- ЭКРАН 0: Приветствие UTP (без скролла, flex-верстка по высоте) -->
         <div id="welcome" class="screen active">
-            <div class="welcome-hero">
-                <div id="welcomeLogo" class="welcome-hero-logo">
-                    <span>ФК</span>
-                </div>
+            <div class="welcome-layout">
+                <div class="welcome-hero">
+                    <div id="welcomeLogo" class="welcome-hero-logo">
+                        <span>ФК</span>
+                    </div>
 
-                <div class="welcome-badge" id="welcomeBadge">
-                    <span class="icon">🛡️</span>
-                    <span>Создано с участием финансовых специалистов</span>
-                </div>
-                <h1 class="fade-slide-soft welcome-hero-title-enter" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
-                <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
-                    ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
-                </p>
-                <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
-                    <span>Накопи подушку</span><span class="dot">•</span>
-                    <span>Закрой долги</span><span class="dot">•</span>
-                    <span>Купи машину</span><span class="dot">•</span>
-                    <span>Поставь свою цель</span>
-                </div>
-            </div>
-            
-            <div class="welcome-result fade-slide-soft" id="welcomeResult">
-                <div class="welcome-result-main">
-                    <div>
-                        <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
+                    <div class="welcome-badge" id="welcomeBadge">
+                        <span class="icon">🛡️</span>
+                        <span>Создано с участием финансовых специалистов</span>
+                    </div>
+                    <h1 class="fade-slide-soft welcome-hero-title-enter" id="welcomeTitle">Наведи порядок в деньгах без стресса</h1>
+                    <p class="welcome-subtitle fade-slide-up" id="welcomeSubtitle">
+                        ИИ ФинКоуч превращает хаос с финансами в простой пошаговый план: от первой подушки до крупной покупки.
+                    </p>
+                    <div class="welcome-tagline fade-slide-up" id="welcomeTagline">
+                        <span>Накопи подушку</span><span class="dot">•</span>
+                        <span>Закрой долги</span><span class="dot">•</span>
+                        <span>Купи машину</span><span class="dot">•</span>
+                        <span>Поставь свою цель</span>
                     </div>
                 </div>
-                <div class="welcome-result-desc">
-                    Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
-                </div>
-            </div>
 
-            <div style="display:flex; justify-content:center; margin-bottom: 4px;">
-                <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
-                    Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                <div class="welcome-center-block">
+                    <div class="welcome-result fade-slide-soft" id="welcomeResult">
+                        <div class="welcome-result-main">
+                            <div>
+                                <div class="welcome-result-amount" id="welcomeAmount">100 000 ₽</div>
+                            </div>
+                        </div>
+                        <div class="welcome-result-desc">
+                            Твоя подушка безопасности за 9 месяцев, если откладывать всего 375 ₽ в день.
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:center; margin-bottom: 4px;">
+                        <div class="welcome-result-badge fade-slide-up" id="welcomeBottomBadge">
+                            Начни с этой суммы — дальше ФинКоуч поможет нарастить запас и идти к более крупным целям без стресса
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div style="display:flex; flex-direction:column; align-items:center; margin-top:14px;">
-                <button class="btn fade-slide-soft" id="startBtn" onclick="onStartClick()" style="margin-bottom: 10px;">
-                    🚀 Начать путь к своей цели
-                </button>
-                <p class="fade-slide-up" id="welcomeSmallText" style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
-                    7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
-                </p>
+                
+                <div class="welcome-bottom">
+                    <button class="btn fade-slide-soft" id="startBtn" onclick="onStartClick()" style="margin-bottom: 4px;">
+                        🚀 Начать путь к своей цели
+                    </button>
+                    <p class="fade-slide-up" id="welcomeSmallText" style="font-size: 12px; color: #6b7280; max-width: 320px; text-align: center;">
+                        7 дней бесплатно. Дальше — меньше, чем чашка кофе в день, чтобы наконец перестать откладывать жизнь «на потом».
+                    </p>
+                </div>
             </div>
         </div>
         
